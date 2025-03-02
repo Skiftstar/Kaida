@@ -1,0 +1,40 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs and debug files
+logs/
+*.log
+
+# Rasa-generated models and temporary files
+models/
+*.tar.gz
+*.nlu.json
+*.nlu.md
+
+# Rasa interactive learning data
+tests/
+*.json
+
+# Rasa cache files
+src/.rasa/cache
+
+# Data generated from training
+*.db
+*.sqlite
+endpoints.lock
+
+# Jupyter notebooks checkpoint files
+.ipynb_checkpoints/
+
+# VS Code and other editor settings
+.vscode/
+.idea/
+*.swp
+.DS_Store
