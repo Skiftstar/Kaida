@@ -1,5 +1,5 @@
 rasa
-faiss-gpu
+faiss-cpu
 sentence-transformers
 psycopg2
 numpy

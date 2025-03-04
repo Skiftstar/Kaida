@@ -25,3 +25,8 @@ CREATE TABLE embeddings (
 ```
 exit with `\q`
 
+# Psycopg2 Setup
+on MacOS you need PostgreSQL from Brew to install psycopg2
+```
+brew install postgresql
+```
