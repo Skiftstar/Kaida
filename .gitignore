@@ -23,7 +23,7 @@ tests/
 *.json
 
 # Rasa cache files
-src/.rasa/cache
+rasa/.rasa/cache
 
 # Data generated from training
 *.db

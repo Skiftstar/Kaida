@@ -1,3 +1,27 @@
 Python 3.10+ doesn't work because of some bad version check in one of the dependencies
 
 Currently using 3.9.6
+
+# Start PostGres
+```
+cd postgres
+docker-compose up -d
+```
+
+# Create Initial Table
+Connect to DB
+```
+docker exec -it pgvector_db psql -U myuser -d my_vectors
+```
+Add Initial Table
+```
+CREATE EXTENSION IF NOT EXISTS vector;
+
+CREATE TABLE embeddings (
+    id SERIAL PRIMARY KEY,
+    text TEXT NOT NULL,
+    embedding vector(384)  -- Match this to your Sentence Transformer model output
+);
+```
+exit with `\q`
+
