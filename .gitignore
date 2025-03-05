@@ -20,10 +20,10 @@ models/
 
 # Rasa interactive learning data
 tests/
-*.json
+python/*.json
 
 # Rasa cache files
-rasa/.rasa/cache
+python/rasa/.rasa/cache
 
 # Data generated from training
 *.db
@@ -38,3 +38,12 @@ endpoints.lock
 .idea/
 *.swp
 .DS_Store
+
+# Node.js
+node_modules/
+dist/
+.env
+
+# TypeScript build output
+*.js
+*.js.map
