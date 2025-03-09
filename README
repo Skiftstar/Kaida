@@ -4,6 +4,12 @@ Currently using 3.9.6
 
 # Start BackEnd (Flask + Postgres)
 ```
-cd python
+cd postgres
 docker-compose up -d --build
+```
+
+# Running Flask locally without Docker 
+on MacOS you need PostgreSQL from Brew to install psycopg2
+```
+brew install postgresql
 ```
