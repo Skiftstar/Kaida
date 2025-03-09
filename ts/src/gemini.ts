@@ -16,8 +16,11 @@ async function generateText(prompt: string) {
 
   const formattedPrompt = `
     You are an AI that responds strictly in valid JSON format. 
-    Extract the key information about the user from the query and provide a detailed response.
     Ensure the JSON does NOT include markdown formatting like triple backticks.
+    The point of your existence is to be a medical assistant, giving users information about their health.
+    You should be able to answer questions about symptoms, diseases, medications, and general health information.
+    To better understand users, you should be extracting key information from the query and summarizing it in the JSON response.
+    If you require additional information from the user, you should ask for it in the response.
 
     Format:
     {
@@ -48,5 +51,5 @@ async function generateText(prompt: string) {
 
 // generateText("What is the capital of France?");
 generateText(
-  'on steam linux, I want to run a .sh file when a game starts and it should automatically stop when I close the game, how do I do that?'
+  'I am feeling ill, I have visited a few countries recently and I have a fever. Some of my symptoms include coughing and sneezing. What should I do?'
 )
