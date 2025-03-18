@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import * as dotenv from 'dotenv'
+import { storeKeyInfo } from './api'
 
 dotenv.config()
 
@@ -42,7 +43,13 @@ async function generateText(prompt: string) {
     const cleanedText = responseText.replace(/```json|```/g, '').trim()
 
     // Parse the cleaned JSON response
-    const jsonResponse = JSON.parse(cleanedText)
+    const jsonResponse: {
+      key_info: string[]
+      required_context: string[]
+    } = JSON.parse(cleanedText)
+
+    storeKeyInfo(jsonResponse.key_info)
+
     console.log(jsonResponse)
   } catch (error) {
     console.error('Error generating text:', error)

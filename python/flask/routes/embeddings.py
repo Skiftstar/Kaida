@@ -29,9 +29,8 @@ def insert_embedding():
 
         # Compute embedding
         embedding = model.encode(text).tolist()
-        now = datetime.now(timezone.utc)
 
-        cur.execute("INSERT INTO embeddings (text, embedding, created_at) VALUES (%s, %s, %s)", (text, embedding, now))
+        cur.execute("INSERT INTO embeddings (text, embedding) VALUES (%s, %s)", (text, embedding))
         conn.commit()
         cur.close()
         conn.close()
@@ -39,6 +38,62 @@ def insert_embedding():
         return jsonify({"message": "Inserted successfully"}), 201
 
     except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+@embeddings_bp.route("insert-many", methods=["POST"])
+def insert_many_embeddings():
+    """Insert multiple text embeddings into the database."""
+    data = request.json
+    texts = data.get("texts")
+
+    if not texts:
+        return jsonify({"error": "Missing 'texts' field"}), 400
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        to_insert = []
+
+        for text in texts:
+            # Check if similiar text exists
+            query_vector = model.encode(text).tolist()
+            cur.execute("""
+            SELECT text, embedding <=> %s::vector AS distance
+            FROM embeddings
+            ORDER BY distance
+            LIMIT %s;
+            """, (query_vector, 1))
+
+            results = [{"text": row[0], "distance": row[1]} for row in cur.fetchall()]
+
+            print(f"Results for text '{text}': {results}")
+
+            if len(results) > 0 and results[0]["distance"] < 0.1:
+                print(f"Similiar text to '{text}' already exists in the database: {results[0]['text']}")
+                continue
+            else:
+                to_insert.append(text)
+
+        # Compute embeddings
+        embeddings = model.encode(to_insert).tolist()
+        now = datetime.now(timezone.utc)
+
+        # Insert new embeddings
+        cur.execute("""
+            INSERT INTO embeddings (text, embedding)
+            SELECT * FROM unnest(%s::text[], %s::vector[])
+        """, (to_insert, embeddings))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        return jsonify({"message": "Inserted successfully"}), 201
+
+    except Exception as e:
+        print(f"Error: {e}")
         return jsonify({"error": str(e)}), 500
     
 
