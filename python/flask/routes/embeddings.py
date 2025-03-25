@@ -76,21 +76,15 @@ def insert_many_embeddings():
             else:
                 to_insert.append(text)
 
-        # Compute embeddings
-        embeddings = model.encode(to_insert).tolist()
-        now = datetime.now(timezone.utc)
+        for text in to_insert:
+            embedding = model.encode(text).tolist()
+            cur.execute("INSERT INTO embeddings (text, embedding) VALUES (%s, %s)", (text, embedding))
+            conn.commit()
 
-        # Insert new embeddings
-        cur.execute("""
-            INSERT INTO embeddings (text, embedding)
-            SELECT * FROM unnest(%s::text[], %s::vector[])
-        """, (to_insert, embeddings))
-
-        conn.commit()
         cur.close()
         conn.close()
 
-        return jsonify({"message": "Inserted successfully"}), 201
+        return jsonify({"message": f"Texts successfully inserted: {', '.join(to_insert)}"}), 201
 
     except Exception as e:
         print(f"Error: {e}")

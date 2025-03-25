@@ -21,11 +21,14 @@ async function generateText(prompt: string) {
     The point of your existence is to be a medical assistant, giving users information about their health.
     You should be able to answer questions about symptoms, diseases, medications, and general health information.
     To better understand users, you should be extracting key information from the query and summarizing it in the JSON response.
+		Differentiate between information that is useful as a permanent info (such as permanent medication, chronic illnesses, eating habits, etc.) and information which is only relevant in the context of the current diagnosis
     Additionally, give keypoints you think further information would be useful for, which will be used to search for more information in our database.
+		If you think nothing is important to note down, you can leave the points empty.
 
     Format:
     {
-      "key_info": ["List of key points summarizing important information you learn about the user."],
+      "key_permanent_info: [List of key points summarizing important permanent information (such as permanent medication, chronic illnesses, eating habits, etc.) or empty list if no useful data]"
+      "key_diagnosis_info": ["List of key points summarizing important information you learn for the current diagnosis only, or empty list if no useful data"],
       "required_context": ["List of key points summarizing important information you think would be useful to search for more information."],
     }
 
@@ -44,11 +47,12 @@ async function generateText(prompt: string) {
 
     // Parse the cleaned JSON response
     const jsonResponse: {
-      key_info: string[]
+      key_permanent_info: string[]
+      key_diagnosis_info: string[]
       required_context: string[]
     } = JSON.parse(cleanedText)
 
-    storeKeyInfo(jsonResponse.key_info)
+    storeKeyInfo(jsonResponse.key_diagnosis_info)
 
     console.log(jsonResponse)
   } catch (error) {
