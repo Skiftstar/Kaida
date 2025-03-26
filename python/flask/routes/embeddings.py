@@ -2,9 +2,8 @@ from flask import request, jsonify
 from datetime import datetime, timezone
 from sentence_transformers import SentenceTransformer
 from db import get_db_connection
-from . import embeddings_bp  # Import the blueprint
+from . import embeddings_bp 
 
-# Load Sentence Transformer model
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 @embeddings_bp.route("/insert", methods=["POST"])
