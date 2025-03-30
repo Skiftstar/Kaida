@@ -1,10 +1,8 @@
 from flask import request, jsonify
 from datetime import datetime, timezone
-from sentence_transformers import SentenceTransformer
+from sentence_transformer import model
 from db import get_db_connection
 from . import embeddings_bp 
-
-model = SentenceTransformer("all-MiniLM-L6-v2")
 
 @embeddings_bp.route("/insert", methods=["POST"])
 def insert_embedding():
@@ -112,6 +110,43 @@ def search_similar():
         """, (query_vector, top_n))
 
         results = [{"text": row[0], "distance": row[1]} for row in cur.fetchall()]
+        cur.close()
+        conn.close()
+
+        return jsonify(results), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@embeddings_bp.route("/search-many", method["GET"])
+def search_similar_many():
+    query_terms = requests.args.getlist("terms")
+    
+    if not query_terms:
+        return jsonify({"error": "Missing 'terms' query parameter"}), 400
+
+    try:
+        query_vectors = model.encode(query_terms).tolist()  # Encode multiple queries
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        results = []
+        for query_vector, x in enumerate(query_vectors):
+            cur.execute("""
+                SELECT text, embedding <=> %s::vector AS distance
+                FROM embeddings
+                ORDER BY distance
+                LIMIT %s;
+            """, (query_vector, 1))
+
+            row = cur.fetchone()
+            if row:
+                text, distance = row
+                results.append({"query_term": query_terms[x], "result": text})
+            else:
+                results.append({"query_term": query_terms[x], "result": ""})
+
         cur.close()
         conn.close()
 

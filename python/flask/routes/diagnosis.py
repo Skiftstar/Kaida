@@ -3,6 +3,25 @@ from db import get_db_connection
 from flask import request, jsonify
 from sentence_transformer import model
 
+@diagnosis_bp.route("/recent-diagnoses", methods=["GET"])
+def get_past_diagnoses():
+    """Fetch past X diagnoses from the database"""
+    data = request.args
+    count = data.get("count", 5, type=int)
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("SELECT id, summary FROM diagnoses ORDER BY created_at DESC LIMIT %s", (count,))
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        diagnoses = [{"id": row[0], "summary": row[1]} for row in rows]
+        return jsonify(diagnoses), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @diagnosis_bp.route("/insert", methods=["POST"])
 def insert_diagnosis():
     """Insert a new diagnosis into the database"""

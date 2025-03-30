@@ -19,3 +19,19 @@ export const storeKeyInfo = async (keyInfo: string[]) => {
 
   return response.json()
 }
+
+export const getRecentDiagnoses = async (amount: number = 5) => {
+	const response = await fetch(`${API_URL}/diagnosis/recent-diagnoses?count=${amount}`, {
+		method: 'GET'
+	})
+
+	return response.json()
+}
+
+export const searchEmbeddings = async (searchTerms: string[]) => {
+	const response = await fetch(`${API_URL}}/embeddings/search-many?terms=${searchTerms.join("&terms=")}`, {
+		method: 'GET'
+	})
+
+	return response.json()
+}
