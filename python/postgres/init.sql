@@ -10,6 +10,7 @@ CREATE TABLE embeddings (
 
 CREATE TABLE diagnoses (
     id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
     summary TEXT NOT NULL,
     summary_embedding vector(384),
     created_at TIMESTAMP DEFAULT NOW(),

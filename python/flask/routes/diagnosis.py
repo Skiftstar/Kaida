@@ -24,24 +24,31 @@ def get_past_diagnoses():
 
 @diagnosis_bp.route("/insert", methods=["POST"])
 def insert_diagnosis():
-    """Insert a new diagnosis into the database"""
+    """Insert a new diagnosis into the database and return its ID"""
     data = request.json
     summary = data.get("summary")
+    title = data.get("title")
 
     if not summary:
         return jsonify({"error": "Missing 'summary' field"}), 400
+    if not title:
+        return jsonify({"error": "Missing 'title' field"}), 400
 
     try:
         conn = get_db_connection()
         cur = conn.cursor()
 
         embedding = model.encode(summary).tolist()
-        cur.execute("INSERT INTO diagnoses (summary, embedding) VALUES (%s, %s)", (summary, embedding))
+        cur.execute(
+            "INSERT INTO diagnoses (title, summary, embedding) VALUES (%s, %s, %s) RETURNING id",
+            (title, summary, embedding)
+        )
+        diagnosis_id = cur.fetchone()[0]  # Fetch the generated ID
         conn.commit()
         cur.close()
         conn.close()
 
-        return jsonify({"message": "Inserted successfully"}), 201
+        return jsonify({"message": "Inserted successfully", "id": diagnosis_id}), 201
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
