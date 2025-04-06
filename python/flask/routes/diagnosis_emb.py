@@ -71,7 +71,7 @@ def insert_many_embeddings(id):
         cur = conn.cursor()
 
         # Fetch existing texts to prevent duplicates
-        cur.execute("SELECT text FROM embeddings WHERE text = ANY(%s);", (texts,))
+        cur.execute("SELECT text FROM diagnosis_embeddings WHERE text = ANY(%s) AND diagnosis_id = %s;", (texts, id))
         existing_texts = {row[0] for row in cur.fetchall()}
         new_texts = [text for text in texts if text not in existing_texts]
 
@@ -84,7 +84,7 @@ def insert_many_embeddings(id):
         embeddings = [model.encode(text).tolist() for text in new_texts]
 
         # Manually execute multiple INSERT statements
-        insert_query = "INSERT INTO embeddings (text, embedding, diagnosis_id) VALUES (%s, %s, %s)"
+        insert_query = "INSERT INTO diagnosis_embeddings (text, embedding, diagnosis_id) VALUES (%s, %s, %s)"
         for text, embedding in zip(new_texts, embeddings):
             cur.execute(insert_query, (text, embedding, id))
 
