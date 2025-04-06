@@ -55,13 +55,12 @@ def insert_embedding(id):
     
 
 @diagonosis_emb_bp.route("/insert-many", methods=["POST"])
-def insert_many_embeddings():
+def insert_many_embeddings(id):
     """Insert multiple embeddings for a given diagnosis ID"""
     data = request.json
-    diagnosis_id = data.get("id")
     texts = data.get("texts")  # List of text entries
 
-    if not diagnosis_id:
+    if not id:
         return jsonify({"error": "Missing 'id' field"}), 400
 
     if not texts or not isinstance(texts, list):
@@ -87,7 +86,7 @@ def insert_many_embeddings():
         # Manually execute multiple INSERT statements
         insert_query = "INSERT INTO embeddings (text, embedding, diagnosis_id) VALUES (%s, %s, %s)"
         for text, embedding in zip(new_texts, embeddings):
-            cur.execute(insert_query, (text, embedding, diagnosis_id))
+            cur.execute(insert_query, (text, embedding, id))
 
         conn.commit()
         cur.close()

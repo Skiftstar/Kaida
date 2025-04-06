@@ -3,7 +3,7 @@ from db import get_db_connection
 from flask import request, jsonify
 from sentence_transformer import model
 
-@diagnosis_bp.route("/recent-diagnoses", methods=["GET"])
+@diagnosis_bp.route("recent-diagnoses", methods=["GET"])
 def get_past_diagnoses():
     """Fetch past X diagnoses from the database"""
     data = request.args
@@ -22,7 +22,7 @@ def get_past_diagnoses():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@diagnosis_bp.route("/insert", methods=["POST"])
+@diagnosis_bp.route("insert", methods=["POST"])
 def insert_diagnosis():
     """Insert a new diagnosis into the database and return its ID"""
     data = request.json
@@ -40,7 +40,7 @@ def insert_diagnosis():
 
         embedding = model.encode(summary).tolist()
         cur.execute(
-            "INSERT INTO diagnoses (title, summary, embedding) VALUES (%s, %s, %s) RETURNING id",
+            "INSERT INTO diagnoses (title, summary, summary_embedding) VALUES (%s, %s, %s) RETURNING id",
             (title, summary, embedding)
         )
         diagnosis_id = cur.fetchone()[0]  # Fetch the generated ID
@@ -53,7 +53,7 @@ def insert_diagnosis():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@diagnosis_bp.route("/update", methods=["PUT"])
+@diagnosis_bp.route("update", methods=["PUT"])
 def update_diagnosis():
     """Update an existing diagnosis in the database"""
     data = request.json

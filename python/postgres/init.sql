@@ -14,7 +14,7 @@ CREATE TABLE diagnoses (
     summary TEXT NOT NULL,
     summary_embedding vector(384),
     created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 CREATE TABLE diagnosis_embeddings (

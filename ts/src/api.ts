@@ -8,7 +8,10 @@ if (!API_URL) {
   throw new Error('Missing API_URL in .env file')
 }
 
+console.log('API_URL:', API_URL)
+
 export const storeKeyPermanentInfo = async (keyInfo: string[]) => {
+  console.log(keyInfo)
   const response = await fetch(`${API_URL}/embeddings/insert-many`, {
     method: 'POST',
     headers: {
@@ -31,19 +34,25 @@ export const createNewDiagnosis = async (
     },
     body: JSON.stringify({ title, summary })
   })
-  const json: any = response.json()
+  const json: any = await response.json()
   const diagnosisId: number = json.id
   return diagnosisId
 }
 
-export const storeKeyDiagnosisInfo = async (keyInfo: string[], diagnosisId: number) => {
-  const response = await fetch(`${API_URL}/diagnosis/${diagnosisId}/embeddings/insert-many`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ texts: keyInfo })
-  })
+export const storeKeyDiagnosisInfo = async (
+  keyInfo: string[],
+  diagnosisId: number
+) => {
+  const response = await fetch(
+    `${API_URL}/diagnosis/${diagnosisId}/embeddings/insert-many`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ texts: keyInfo })
+    }
+  )
 
   return response.json()
 }
@@ -60,12 +69,17 @@ export const getRecentDiagnoses = async (amount: number = 5) => {
 }
 
 export const searchEmbeddings = async (searchTerms: string[]) => {
+  const params = new URLSearchParams()
+  searchTerms.forEach((term) => {
+    params.append('terms', term)
+  })
   const response = await fetch(
-    `${API_URL}}/embeddings/search-many?terms=${searchTerms.join('&terms=')}`,
+    `${API_URL}/embeddings/search-many?${params.toString()}`,
     {
       method: 'GET'
     }
   )
 
-  return response.json()
+  const json = await response.json()
+  return json
 }

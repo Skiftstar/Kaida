@@ -1,9 +1,9 @@
-const JSON_BOILERPLATE = `
+export const JSON_BOILERPLATE = `
     You are an AI that responds strictly in valid JSON format.
     Ensure the JSON does NOT include markdown formatting like triple backticks.
 `
 
-const NEW_CHAT_PROMPT = `
+export const NEW_CHAT_PROMPT = `
     ${JSON_BOILERPLATE}
     The point of your existence is to be a medical assistant, giving users information about their health.
     You should be able to answer questions about symptoms, diseases, medications, and general health information.
@@ -28,7 +28,7 @@ const NEW_CHAT_PROMPT = `
     Respond with only the JSON object.
 `
 
-const KNOWLEDGE_DATABASE_RESPONSE = `
+export const KNOWLEDGE_DATABASE_RESPONSE = `
     ${JSON_BOILERPLATE}
     Based on your last response, we have checked our database and will provide you with the information we found.
     If we didn't find anything about it in our database, the information will be empty.
@@ -48,7 +48,7 @@ const KNOWLEDGE_DATABASE_RESPONSE = `
     Respond with only the JSON object.
 `
 
-const FOLLOW_UP_PROMPT = `
+export const FOLLOW_UP_PROMPT = `
     ${JSON_BOILERPLATE}
     We will give you the user response to your last query.
     If you have additional things you'd like us to check in the database, please include them in the response format.

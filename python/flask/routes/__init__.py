@@ -6,3 +6,5 @@ diagonosis_emb_bp = Blueprint("diagonosis_emb", __name__)
 
 # Import all routes
 from .embeddings import *
+from .diagnosis import *
+from .diagnosis_emb import *

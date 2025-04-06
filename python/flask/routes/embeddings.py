@@ -4,7 +4,7 @@ from sentence_transformer import model
 from db import get_db_connection
 from . import embeddings_bp 
 
-@embeddings_bp.route("/insert", methods=["POST"])
+@embeddings_bp.route("insert", methods=["POST"])
 def insert_embedding():
     """Insert a new text embedding into the database."""
     data = request.json
@@ -88,7 +88,7 @@ def insert_many_embeddings():
         return jsonify({"error": str(e)}), 500
     
 
-@embeddings_bp.route("/search", methods=["GET"])
+@embeddings_bp.route("search", methods=["GET"])
 def search_similar():
     """Search for similar embeddings in the database."""
     query_text = request.args.get("text")
@@ -119,20 +119,20 @@ def search_similar():
         return jsonify({"error": str(e)}), 500
 
 
-@embeddings_bp.route("/search-many", method["GET"])
+@embeddings_bp.route("search-many", methods=["GET"])
 def search_similar_many():
-    query_terms = requests.args.getlist("terms")
+    query_terms = request.args.getlist("terms")
     
     if not query_terms:
         return jsonify({"error": "Missing 'terms' query parameter"}), 400
 
     try:
-        query_vectors = model.encode(query_terms).tolist()  # Encode multiple queries
         conn = get_db_connection()
         cur = conn.cursor()
 
         results = []
-        for query_vector, x in enumerate(query_vectors):
+        for text in query_terms:
+            query_vector = model.encode(text).tolist()
             cur.execute("""
                 SELECT text, embedding <=> %s::vector AS distance
                 FROM embeddings
@@ -142,10 +142,10 @@ def search_similar_many():
 
             row = cur.fetchone()
             if row:
-                text, distance = row
-                results.append({"query_term": query_terms[x], "result": text})
+                result_text, distance = row
+                results.append({"query_term": text, "result": result_text})
             else:
-                results.append({"query_term": query_terms[x], "result": ""})
+                results.append({"query_term": text, "result": ""})
 
         cur.close()
         conn.close()

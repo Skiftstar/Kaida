@@ -3,10 +3,16 @@ import * as dotenv from 'dotenv'
 import {
   createNewDiagnosis,
   getRecentDiagnoses,
+  searchEmbeddings,
   storeKeyDiagnosisInfo,
   storeKeyPermanentInfo
 } from './api'
 import * as readline from 'readline' // for terminal input
+import {
+  FOLLOW_UP_PROMPT,
+  KNOWLEDGE_DATABASE_RESPONSE,
+  NEW_CHAT_PROMPT
+} from './prompts'
 
 async function parseInitialQuery(
   prompt: string,
@@ -61,6 +67,28 @@ function getInput(query: string): Promise<string> {
   })
 }
 
+//TODO: change diagnosesData type
+async function generateInitialResponse(
+  requestedKnowledgeData: { [term: string]: string },
+  diagnosesData: any,
+  userQuery: string,
+  chatSession: ChatSession
+) {
+  const prompt_template = KNOWLEDGE_DATABASE_RESPONSE.replace(
+    '{{diagnoses}}',
+    JSON.stringify(diagnosesData)
+  )
+    .replace('{{knowledge_database}}', JSON.stringify(requestedKnowledgeData))
+    .replace('{{user_query}}', userQuery)
+
+  const result = await chatSession.sendMessage(prompt_template)
+  const responseText = result.response.text()
+  const cleanedText = responseText.replace(/```json|```/g, '').trim()
+  const jsonResponse: { response: string } = JSON.parse(cleanedText)
+  console.log('jsonResponse', jsonResponse)
+  return jsonResponse
+}
+
 async function formatNewChatPrompt(input: string): Promise<string> {
   const QUERY_COUNT = 5
   const diagnoses = await getRecentDiagnoses(QUERY_COUNT)
@@ -89,7 +117,10 @@ async function main() {
   const input = await getInput('How can I help you today?')
   const formattedNewChatPrompt = await formatNewChatPrompt(input)
 
-  const initialQueryInformation = await parseInitialQuery(formattedNewChatPrompt, chatSession)
+  const initialQueryInformation = await parseInitialQuery(
+    formattedNewChatPrompt,
+    chatSession
+  )
 
   if (!initialQueryInformation) {
     console.error('Failed to parse initial query.')
@@ -102,13 +133,38 @@ async function main() {
   )
 
   // Store the key information in the database
-  await storeKeyPermanentInfo(initialQueryInformation.key_permanent_info)
-  await storeKeyDiagnosisInfo(
-    initialQueryInformation.key_diagnosis_info,
-    diagnosisId
-  )
+  if (initialQueryInformation.key_permanent_info.length > 0) {
+    console.log(
+      'Storing key permanent info:',
+      initialQueryInformation.key_permanent_info
+    )
+    await storeKeyPermanentInfo(initialQueryInformation.key_permanent_info)
+  }
+  if (initialQueryInformation.key_diagnosis_info.length > 0) {
+    console.log(
+      'Storing key diagnosis info:',
+      initialQueryInformation.key_diagnosis_info
+    )
+    await storeKeyDiagnosisInfo(
+      initialQueryInformation.key_diagnosis_info,
+      diagnosisId
+    )
+  }
 
   //TODO: Lookup information that Gemini wants and generate response with that
+  const knowledgeData = await searchEmbeddings(
+    initialQueryInformation.required_context
+  )
+  const diagnosesData: any[] = []
+
+  const modelResponse = await generateInitialResponse(
+    knowledgeData,
+    diagnosesData,
+    input,
+    chatSession
+  )
+  const response = modelResponse.response
+  console.log('Response:', response)
 
   let userInput = ''
 
