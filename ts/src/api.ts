@@ -26,7 +26,7 @@ export const storeKeyPermanentInfo = async (keyInfo: string[]) => {
 export const createNewDiagnosis = async (
   title: string,
   summary: string
-): Promise<number> => {
+): Promise<string> => {
   const response = await fetch(`${API_URL}/diagnosis/insert`, {
     method: 'POST',
     headers: {
@@ -35,13 +35,13 @@ export const createNewDiagnosis = async (
     body: JSON.stringify({ title, summary })
   })
   const json: any = await response.json()
-  const diagnosisId: number = json.id
+  const diagnosisId: string = json.id
   return diagnosisId
 }
 
 export const storeKeyDiagnosisInfo = async (
   keyInfo: string[],
-  diagnosisId: number
+  diagnosisId: string
 ) => {
   const response = await fetch(
     `${API_URL}/diagnosis/${diagnosisId}/embeddings/insert-many`,
