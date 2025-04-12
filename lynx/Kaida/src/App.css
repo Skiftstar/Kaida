@@ -1,0 +1,31 @@
+.theme-light {
+  --color-text: #000;
+  --background-color: #fff;
+}
+
+.theme-dark {
+  --color-text: #fff;
+  --background-color: #000;
+}
+
+view {
+  background-color: var(--background-color);
+  color: var(--color-text);
+}
+
+text {
+  color: var(--color-text);
+}
+
+.navbar {
+  position: absolute;
+  top: 0;
+  height: 100vh;
+  padding-top: "50px";
+  padding-left: "20px";
+  padding-right: "20px";
+  display: "flex";
+  flex-direction: "column";
+  gap: "10px";
+  transition: width 0.1s ease-in;
+}
