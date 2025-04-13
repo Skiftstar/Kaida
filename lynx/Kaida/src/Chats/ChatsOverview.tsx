@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router"
-import { formatDate } from "./DateUtil.js"
+import { formatDate } from "./../DateUtil.js"
 
 export function Chats() {
   const nav = useNavigate()
@@ -7,7 +7,7 @@ export function Chats() {
   const chats = [
     {
       id: 1,
-      title: "Veeeeeeery long title wawawawawawawawawawawa",
+      title: "Veeeeeeery long title wawawawawawawawabebebebebebebe",
       lastMessage:
         "Hello, this is a long message that should be truncated if it is too long",
       timestamp: 1744359120,
@@ -20,7 +20,7 @@ export function Chats() {
     },
     {
       id: 3,
-      title: "Chat 3",
+      title: "Veeeeeeery long title wawawawawawawawabebebebebebebe",
       lastMessage: "Another message here",
       timestamp: 1733821920,
     },
@@ -28,12 +28,6 @@ export function Chats() {
 
   return (
     <view>
-      <text
-        style={{ marginTop: "50px", marginLeft: "100px" }}
-        bindtap={() => nav("/")}
-      >
-        Navigate to Base
-      </text>
       <view>
         {chats.map((chat) => {
           const date = formatDate(new Date(chat.timestamp * 1000))
@@ -55,8 +49,23 @@ export function Chats() {
                   alignItems: "center",
                 }}
               >
-                <text style={{ fontWeight: "bold" }}>{chat.title}</text>
-                <text style={{ color: "#888", marginLeft: "10px" }}>
+                <text
+                  style={{
+                    fontWeight: "bold",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                  }}
+                >
+                  {chat.title}
+                </text>
+                <text
+                  style={{
+                    color: "#888",
+                    marginLeft: "10px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
                   {date}
                 </text>
               </view>
