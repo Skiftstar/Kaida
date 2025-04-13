@@ -41,8 +41,13 @@ export function Navbar({
           class={`navbar`}
           style={{
             width: baseStyle.width,
-            // paddingTop: "50px",
-            // paddingLeft: "20px",
+            position: "absolute",
+            top: "0",
+            height: "100vh",
+            display: "flex",
+            flexDirection: "column",
+            gap: "10px",
+            transition: "width 0.1s ease-in",
           }}
           catchtap={(e) => {}} // This prevents the event from bubbling up
         >

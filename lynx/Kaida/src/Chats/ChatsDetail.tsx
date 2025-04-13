@@ -1,29 +1,10 @@
 import { useParams } from "react-router"
+import { demoTextMsgs } from "../DemoData.js"
 
 export function ChatsDetail() {
   const { id } = useParams()
 
-  const textmsgs = [
-    {
-      id: 1,
-      sender: "User",
-      message:
-        "Hello, this is a long message that should be wrapped if it is too long",
-      timestamp: 1744359120,
-    },
-    {
-      id: 2,
-      sender: "Bot",
-      message: "This is a short message",
-      timestamp: 1743495120,
-    },
-    {
-      id: 3,
-      sender: "User",
-      message: "Another message here",
-      timestamp: 1733821920,
-    },
-  ]
+  const textmsgs = demoTextMsgs
 
   return (
     <view
@@ -34,13 +15,13 @@ export function ChatsDetail() {
         height: "100vh",
       }}
     >
-      <view
+      <scroll-view
         style={{
           height: "80%",
           width: "full",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "scroll",
+          //   display: "flex",
+          //   flexDirection: "column",
+          //   overflow: "visible",
         }}
       >
         {textmsgs.map((msg) => {
@@ -50,7 +31,7 @@ export function ChatsDetail() {
                 display: "flex",
                 justifyContent: msg.sender === "User" ? "end" : "start",
                 borderRadius: "10px",
-                padding: "10px",
+                padding: "5px",
                 // margin: "10px",
                 marginRight: "10px",
                 marginLeft: "10px",
@@ -63,6 +44,9 @@ export function ChatsDetail() {
                   borderRadius: "10px",
                   padding: "10px",
                   maxWidth: "85%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
                 <text>{msg.message}</text>
@@ -70,7 +54,7 @@ export function ChatsDetail() {
             </view>
           )
         })}
-      </view>
+      </scroll-view>
       <view
         style={{
           display: "flex",
