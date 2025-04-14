@@ -1,27 +1,36 @@
 import { useParams } from "react-router"
 import { demoTextMsgs } from "../DemoData.js"
+import { useState } from "react"
 
 export function ChatsDetail() {
   const { id } = useParams()
-
-  const textmsgs = demoTextMsgs
+  const [inputValue, setInputValue] = useState("")
+  const [textmsgs, setTextMsgs] = useState(demoTextMsgs)
 
   return (
     <view
       style={{
-        // display: "flex",
-        // flexDirection: "column",
-        // flex: "0 0 80%",
         height: "100vh",
       }}
     >
       <scroll-view
+        bindcontentsizechanged={() => {
+          lynx
+            .createSelectorQuery()
+            .select(`#scroll`)
+            .invoke({
+              method: "autoScroll",
+              params: {
+                rate: 5000, // Scrolling speed in px/sec
+                start: true,
+              },
+            })
+            .exec()
+        }}
+        id="scroll"
         style={{
           height: "80%",
           width: "full",
-          //   display: "flex",
-          //   flexDirection: "column",
-          //   overflow: "visible",
         }}
       >
         {textmsgs.map((msg) => {
@@ -60,6 +69,8 @@ export function ChatsDetail() {
           display: "flex",
           justifyContent: "center",
           width: "full",
+          marginTop: "20px",
+          marginLeft: "10px",
         }}
       >
         <input
@@ -75,18 +86,43 @@ export function ChatsDetail() {
           type="text"
           size={50}
           placeholder="Input..."
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              textmsgs.push({
-                id: textmsgs.length + 1,
-                sender: "User",
-                message: e.currentTarget.value,
-                timestamp: Math.floor(Date.now() / 1000),
-              })
-            }
-            e.currentTarget.value = ""
+          value={inputValue}
+          bindinput={(e) => {
+            setInputValue(e.detail.value)
           }}
         />
+        <view
+          style={{
+            width: "10%",
+            height: "50px",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          bindtap={() => {
+            console.log("Send message:", inputValue)
+            setTextMsgs((prev) => [
+              ...prev,
+              {
+                message: inputValue,
+                sender: "User",
+                timestamp: Date.now(),
+                id: prev.length + 1,
+              },
+            ])
+            setInputValue("")
+          }}
+        >
+          <text
+            style={{
+              fontSize: "20px",
+              fontWeight: "bold",
+              color: "#007AFF",
+            }}
+          >
+            {">"}
+          </text>
+        </view>
       </view>
     </view>
   )
