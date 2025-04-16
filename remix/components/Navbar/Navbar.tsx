@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { NavbarEntry } from "./NavbarEntry.jsx"
 
 export function Navbar({
@@ -25,8 +24,8 @@ export function Navbar({
   ]
 
   return (
-    <view style={{ position: "absolute" }}>
-      <view
+    <div style={{ position: "absolute" }}>
+      <div
         style={{
           position: "absolute",
           top: "0",
@@ -36,10 +35,10 @@ export function Navbar({
           backgroundColor: "rgba(0, 0, 0, 0.5)",
           display: navbarOpen ? "block" : "none",
         }}
-        bindtap={toggleNavbar}
+        onClick={toggleNavbar}
       >
-        <view
-          class={`navbar`}
+        <div
+          className={`navbar`}
           style={{
             width: baseStyle.width,
             position: "absolute",
@@ -50,15 +49,19 @@ export function Navbar({
             gap: "10px",
             transition: "width 0.1s ease-in",
           }}
-          catchtap={(e) => {}} // This prevents the event from bubbling up
+          onClick={(e) => {
+            e.stopPropagation()
+          }}
+          //   ={(e) => {}} // This prevents the event from bubbling up
         >
           {navbarOpen && (
-            <view>
-              <image
-                src="https://placehold.co/800x400.png" // Replace with your icon URL
+            <div>
+              <img
+                src={"https://placehold.co/800x400.png"} // Replace with your icon URL
                 style={{ width: "full", height: "200px" }}
+                alt="navbar"
               />
-              <view style={{ marginLeft: "10px" }}>
+              <div style={{ marginLeft: "10px" }}>
                 {navElements.map(({ path, name }) => (
                   <NavbarEntry
                     name={`${name}`}
@@ -68,16 +71,16 @@ export function Navbar({
                     toggleNavbar={toggleNavbar}
                   />
                 ))}
-              </view>
-            </view>
+              </div>
+            </div>
           )}
           {navbarOpen && (
-            <view bindtap={toggleTheme}>
+            <div onClick={toggleTheme}>
               <text>{isDark ? "Light" : "Dark"} Mode</text>
-            </view>
+            </div>
           )}
-        </view>
-      </view>
-    </view>
+        </div>
+      </div>
+    </div>
   )
 }

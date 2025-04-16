@@ -1,9 +1,7 @@
 import { useState } from "react"
-import { Outlet } from "react-router"
 import { Navbar } from "./Navbar/Navbar.jsx"
-import "./../App.css"
 
-export function Layout() {
+export function SideLayout() {
   const [isDark, setIsDark] = useState(false)
   const [navbarOpen, setNavbarOpen] = useState(false)
   const [currentScreen, setCurrentScreen] = useState("Chats")
@@ -19,7 +17,7 @@ export function Layout() {
   }
 
   return (
-    <view
+    <div
       className={themeClass}
       style={{
         flex: 1,
@@ -29,8 +27,8 @@ export function Layout() {
         width: "100vw",
       }}
     >
-      <view style={{ flex: 1 }}>
-        <view
+      <div style={{ flex: 1 }}>
+        <div
           style={{
             height: "100px",
             display: "flex",
@@ -42,16 +40,15 @@ export function Layout() {
           }}
         >
           {!navbarOpen && (
-            <view bindtap={toggleNavbar}>
-              <text style={{ fontSize: "26px", fontWeight: "bold" }}>=</text>
-            </view>
+            <div onClick={toggleNavbar}>
+              <span style={{ fontSize: "26px", fontWeight: "bold" }}>=</span>
+            </div>
           )}
-          <text style={{ fontWeight: "bold", fontSize: "26px" }}>
+          <span style={{ fontWeight: "bold", fontSize: "26px" }}>
             {currentScreen}
-          </text>
-        </view>
-        <Outlet />
-      </view>
+          </span>
+        </div>
+      </div>
 
       <Navbar
         isDark={isDark}
@@ -60,6 +57,6 @@ export function Layout() {
         navbarOpen={navbarOpen}
         toggleNavbar={toggleNavbar}
       />
-    </view>
+    </div>
   )
 }
