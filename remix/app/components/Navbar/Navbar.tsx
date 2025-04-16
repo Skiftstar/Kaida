@@ -24,17 +24,24 @@ export function Navbar({
   ];
 
   return (
-    <div style={{ position: "absolute" }}>
+    <div
+      style={{
+        position: "absolute",
+        height: "932px",
+        width: "430px",
+        top: "0",
+        left: "0",
+        display: navbarOpen ? "block" : "none",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+      }}
+    >
       <div
         style={{
           position: "absolute",
-          top: "0",
-          left: "0",
           height: "932px",
           width: "430px",
-
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
           display: navbarOpen ? "block" : "none",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
         }}
         onClick={toggleNavbar}
       >
