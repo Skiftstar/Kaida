@@ -1,4 +1,4 @@
-// import { useNavigate } from "react-router"
+import { useNavigate } from "@remix-run/react";
 
 export function NavbarEntry({
   name,
@@ -6,21 +6,21 @@ export function NavbarEntry({
   setCurrentScreen,
   toggleNavbar,
 }: {
-  name: string
-  path: string
-  setCurrentScreen: (screen: string) => void
-  toggleNavbar: () => void
+  name: string;
+  path: string;
+  setCurrentScreen: (screen: string) => void;
+  toggleNavbar: () => void;
 }) {
-  //   const nav = useNavigate()
+  const nav = useNavigate();
 
   return (
     <div
       key={path}
-      //   onClick={() => {
-      //     nav(path)
-      //     setCurrentScreen(name)
-      //     toggleNavbar()
-      //   }}
+      onClick={() => {
+        nav(path);
+        setCurrentScreen(name);
+        toggleNavbar();
+      }}
       style={{
         padding: "10px",
         display: "flex",
@@ -35,5 +35,5 @@ export function NavbarEntry({
       />
       <span style={{ fontSize: "26px" }}>{name}</span>
     </div>
-  )
+  );
 }
