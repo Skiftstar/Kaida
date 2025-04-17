@@ -1,24 +1,25 @@
-import { useParams } from "@remix-run/react";
-import { useEffect, useState } from "react";
+import { useParams } from "@remix-run/react"
+import { useEffect, useState } from "react"
+import { demoTextMsgs } from "~/DemoData"
 
 export default function ChatsDetail() {
-  const { id } = useParams();
-  const [inputValue, setInputValue] = useState("");
+  const { id } = useParams()
+  const [inputValue, setInputValue] = useState("")
   const [textmsgs, setTextMsgs] = useState<
     {
-      id: number;
-      sender: string;
-      message: string;
-      timestamp: number;
+      id: number
+      sender: string
+      message: string
+      timestamp: number
     }[]
-  >([]);
+  >(demoTextMsgs)
 
   useEffect(() => {
-    const div = document.getElementById("scroll");
+    const div = document.getElementById("scroll")
     if (div) {
-      div.scrollTop = div.scrollHeight;
+      div.scrollTop = div.scrollHeight
     }
-  }, [textmsgs]);
+  }, [textmsgs])
 
   return (
     <div
@@ -29,7 +30,7 @@ export default function ChatsDetail() {
       <div
         id="scroll"
         style={{
-          height: "80%",
+          height: "84%",
           width: "full",
           overflowY: "scroll",
         }}
@@ -37,12 +38,12 @@ export default function ChatsDetail() {
         {textmsgs.map((msg) => {
           return (
             <div
+              key={msg.id}
               style={{
                 display: "flex",
                 justifyContent: msg.sender === "User" ? "end" : "start",
                 borderRadius: "10px",
                 padding: "5px",
-                // margin: "10px",
                 marginRight: "10px",
                 marginLeft: "10px",
                 width: "fit",
@@ -60,18 +61,10 @@ export default function ChatsDetail() {
                 <span className="max-w-full break-words">{msg.message}</span>
               </div>
             </div>
-          );
+          )
         })}
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          width: "full",
-          marginTop: "20px",
-          marginLeft: "10px",
-        }}
-      >
+      <div className="mt-2 ml-2 w-full items-center justify-center flex">
         <input
           className="textInput"
           style={{
@@ -87,7 +80,7 @@ export default function ChatsDetail() {
           placeholder="Input..."
           value={inputValue}
           onChange={(e) => {
-            setInputValue(e.currentTarget.value);
+            setInputValue(e.currentTarget.value)
           }}
         />
         <div
@@ -98,31 +91,32 @@ export default function ChatsDetail() {
             justifyContent: "center",
             alignItems: "center",
           }}
-          onClick={() => {
-            console.log("Send message:", inputValue);
-            setTextMsgs((prev) => [
-              ...prev,
-              {
-                message: inputValue,
-                sender: "Bot",
-                timestamp: Date.now(),
-                id: prev.length + 1,
-              },
-            ]);
-            setInputValue("");
-          }}
         >
-          <span
+          <button
+            className="font-bold text-[#007AFF] text-xl"
             style={{
               fontSize: "20px",
               fontWeight: "bold",
               color: "#007AFF",
             }}
+            onClick={() => {
+              if (!inputValue || inputValue.length === 0) return
+              setTextMsgs((prev) => [
+                ...prev,
+                {
+                  message: inputValue,
+                  sender: "User",
+                  timestamp: Date.now(),
+                  id: prev.length + 1,
+                },
+              ])
+              setInputValue("")
+            }}
           >
             {">"}
-          </span>
+          </button>
         </div>
       </div>
     </div>
-  );
+  )
 }

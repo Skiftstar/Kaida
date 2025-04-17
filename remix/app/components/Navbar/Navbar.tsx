@@ -1,4 +1,4 @@
-import { NavbarEntry } from "./NavbarEntry.js";
+import { NavbarEntry } from "./NavbarEntry.js"
 
 export function Navbar({
   toggleTheme,
@@ -7,28 +7,28 @@ export function Navbar({
   navbarOpen,
   toggleNavbar,
 }: {
-  toggleTheme: () => void;
-  isDark: boolean;
-  setCurrentScreen: (screen: string) => void;
-  navbarOpen: boolean;
-  toggleNavbar: () => void;
+  toggleTheme: () => void
+  isDark: boolean
+  setCurrentScreen: (screen: string) => void
+  navbarOpen: boolean
+  toggleNavbar: () => void
 }) {
   const baseStyle = {
     width: navbarOpen ? "60%" : "0%",
-  };
+  }
 
   const navElements: { path: string; name: string }[] = [
     { path: "/", name: "Chats" },
     { path: "/meds", name: "Medication" },
     { path: "/sessions", name: "Sessions" },
-  ];
+  ]
 
   return (
     <div
       style={{
         position: "absolute",
-        height: "932px",
-        width: "430px",
+        height: "100%",
+        aspectRatio: "9 / 19",
         top: "0",
         left: "0",
         display: navbarOpen ? "block" : "none",
@@ -38,8 +38,8 @@ export function Navbar({
       <div
         style={{
           position: "absolute",
-          height: "932px",
-          width: "430px",
+          height: "100%",
+          aspectRatio: "9 / 19",
           display: navbarOpen ? "block" : "none",
           backgroundColor: "rgba(0, 0, 0, 0.5)",
         }}
@@ -59,9 +59,8 @@ export function Navbar({
             overflow: "hidden",
           }}
           onClick={(e) => {
-            e.stopPropagation();
+            e.stopPropagation()
           }}
-          //   ={(e) => {}} // This prevents the event from bubbling up
         >
           {navbarOpen && (
             <div>
@@ -84,12 +83,12 @@ export function Navbar({
             </div>
           )}
           {navbarOpen && (
-            <div onClick={toggleTheme}>
-              <text>{isDark ? "Light" : "Dark"} Mode</text>
-            </div>
+            <button onClick={toggleTheme}>
+              <span>{isDark ? "Light" : "Dark"} Mode</span>
+            </button>
           )}
         </div>
       </div>
     </div>
-  );
+  )
 }

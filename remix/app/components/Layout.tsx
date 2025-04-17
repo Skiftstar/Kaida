@@ -1,21 +1,23 @@
-import { useState } from "react";
-import { Navbar } from "./Navbar/Navbar.js";
-import { Outlet } from "@remix-run/react";
+import { useState } from "react"
+import { Navbar } from "./Navbar/Navbar.js"
+import { Outlet, useNavigate } from "@remix-run/react"
 
 export function SideLayout() {
-  const [isDark, setIsDark] = useState(false);
-  const [navbarOpen, setNavbarOpen] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState("Chats");
+  const [isDark, setIsDark] = useState(false)
+  const [navbarOpen, setNavbarOpen] = useState(false)
+  const [currentScreen, setCurrentScreen] = useState("Chats")
 
-  const themeClass = isDark ? "theme-dark" : "theme-light";
+  const nav = useNavigate()
+
+  const themeClass = isDark ? "theme-dark" : "theme-light"
 
   const toggleTheme = () => {
-    setIsDark((prev) => !prev);
-  };
+    setIsDark((prev) => !prev)
+  }
 
   const toggleNavbar = () => {
-    setNavbarOpen((prev) => !prev);
-  };
+    setNavbarOpen((prev) => !prev)
+  }
 
   return (
     <div className="w-[100vw] h-[100vh]">
@@ -25,10 +27,11 @@ export function SideLayout() {
           flex: 1,
           position: "relative",
           overflow: "hidden",
-          height: "932px",
-          width: "430px",
+          height: "100%",
+          aspectRatio: "9 / 19",
           marginLeft: "auto",
           marginRight: "auto",
+          borderRadius: "20px",
         }}
       >
         <div style={{ flex: 1 }}>
@@ -37,20 +40,39 @@ export function SideLayout() {
               height: "50px",
               display: "flex",
               justifyContent: "start",
-              alignItems: "end",
-              gap: "40px",
+              alignItems: "center",
+              gap: "20px",
               paddingLeft: "20px",
-              paddingBottom: "20px",
+              paddingBottom: "15px",
+              marginTop: "15px",
             }}
           >
             {!navbarOpen && (
-              <div onClick={toggleNavbar}>
-                <span style={{ fontSize: "26px", fontWeight: "bold" }}>=</span>
+              <div>
+                <button
+                  onClick={toggleNavbar}
+                  style={{ fontSize: "26px", fontWeight: "bold" }}
+                >
+                  =
+                </button>
               </div>
             )}
             <span style={{ fontWeight: "bold", fontSize: "26px" }}>
               {currentScreen}
             </span>
+            <button
+              onClick={() => {
+                nav("/profile")
+                setCurrentScreen("Profile")
+              }}
+              className="ml-auto mr-5"
+            >
+              <img
+                src="https://placehold.co/50x50.png"
+                alt="profile"
+                className="rounded-full w-[40px]"
+              />
+            </button>
           </div>
           <Outlet />
         </div>
@@ -64,5 +86,5 @@ export function SideLayout() {
         />
       </div>
     </div>
-  );
+  )
 }
