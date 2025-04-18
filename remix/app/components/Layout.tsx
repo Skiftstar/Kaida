@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Navbar } from "./Navbar/Navbar.js"
 import { Outlet, useNavigate } from "@remix-run/react"
 
-export function SideLayout() {
+export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
   const [isDark, setIsDark] = useState(false)
   const [navbarOpen, setNavbarOpen] = useState(false)
   const [currentScreen, setCurrentScreen] = useState("Chats")
@@ -35,45 +35,47 @@ export function SideLayout() {
         }}
       >
         <div style={{ flex: 1 }}>
-          <div
-            style={{
-              height: "50px",
-              display: "flex",
-              justifyContent: "start",
-              alignItems: "center",
-              gap: "20px",
-              paddingLeft: "20px",
-              paddingBottom: "15px",
-              marginTop: "15px",
-            }}
-          >
-            {!navbarOpen && (
-              <div>
-                <button
-                  onClick={toggleNavbar}
-                  style={{ fontSize: "26px", fontWeight: "bold" }}
-                >
-                  =
-                </button>
-              </div>
-            )}
-            <span style={{ fontWeight: "bold", fontSize: "26px" }}>
-              {currentScreen}
-            </span>
-            <button
-              onClick={() => {
-                nav("/profile")
-                setCurrentScreen("Profile")
+          {isLoggedIn && (
+            <div
+              style={{
+                height: "50px",
+                display: "flex",
+                justifyContent: "start",
+                alignItems: "center",
+                gap: "20px",
+                paddingLeft: "20px",
+                paddingBottom: "15px",
+                marginTop: "15px",
               }}
-              className="ml-auto mr-5"
             >
-              <img
-                src="https://placehold.co/50x50.png"
-                alt="profile"
-                className="rounded-full w-[40px]"
-              />
-            </button>
-          </div>
+              {!navbarOpen && (
+                <div>
+                  <button
+                    onClick={toggleNavbar}
+                    style={{ fontSize: "26px", fontWeight: "bold" }}
+                  >
+                    =
+                  </button>
+                </div>
+              )}
+              <span style={{ fontWeight: "bold", fontSize: "26px" }}>
+                {currentScreen}
+              </span>
+              <button
+                onClick={() => {
+                  nav("/profile")
+                  setCurrentScreen("Profile")
+                }}
+                className="ml-auto mr-5"
+              >
+                <img
+                  src="https://placehold.co/50x50.png"
+                  alt="profile"
+                  className="rounded-full w-[40px]"
+                />
+              </button>
+            </div>
+          )}
           <Outlet />
         </div>
 
