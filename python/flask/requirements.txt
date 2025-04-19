@@ -1,4 +1,6 @@
-flask
-psycopg2-binary
-sentence-transformers
-rasa
+psycopg2-binary==2.9.9
+sentence-transformers==3.4.1
+Flask==3.1.0
+Flask-Cors==5.0.1
+Flask-Login==0.6.3
+Werkzeug==3.1.3

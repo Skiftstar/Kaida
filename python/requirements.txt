@@ -1,6 +1,5 @@
-rasa
-faiss-cpu
-sentence-transformers
-psycopg2
-numpy
-flask
+rasa==3.6.21
+faiss-cpu==1.8.0post1
+sentence-transformers==3.4.1
+psycopg2==2.9.10
+numpy==1.23.5

@@ -8,6 +8,19 @@ CREATE TABLE embeddings (
     embedding vector(384)
 );
 
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL -- hashed!
+);
+
+INSERT INTO users (username, password)
+SELECT 'admin', 'pbkdf2:sha256:1000000$afLeq4uWZFsjSIm7$8aded7d5d9b4681dbc1605905690d70e2282c53a84b1b804c1b8e170904ef100' -- Just '1234' as password
+WHERE NOT EXISTS (
+    SELECT 1 FROM users WHERE username = 'admin'
+);
+
+
 CREATE TABLE diagnoses (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
