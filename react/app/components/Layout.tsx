@@ -1,28 +1,28 @@
-import { useState } from "react"
-import { Navbar } from "./Navbar/Navbar.js"
-import { Outlet, useNavigate } from "react-router"
+import { useState } from "react";
+import { Navbar } from "./Navbar/Navbar.js";
+import { Outlet, useNavigate } from "react-router";
 
 export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const [isDark, setIsDark] = useState(false)
-  const [navbarOpen, setNavbarOpen] = useState(false)
-  const [currentScreen, setCurrentScreen] = useState("Chats")
+  const [isDark, setIsDark] = useState(false);
+  const [navbarOpen, setNavbarOpen] = useState(false);
+  const [currentScreen, setCurrentScreen] = useState("Chats");
 
-  const nav = useNavigate()
+  const nav = useNavigate();
 
-  const themeClass = isDark ? "theme-dark" : "theme-light"
+  const themeClass = isDark ? "theme-dark" : "theme-light";
 
   const toggleTheme = () => {
-    setIsDark((prev) => !prev)
-  }
+    setIsDark((prev) => !prev);
+  };
 
   const toggleNavbar = () => {
-    setNavbarOpen((prev) => !prev)
-  }
+    setNavbarOpen((prev) => !prev);
+  };
 
   return (
-    <div className="w-[100vw] h-[100vh]">
+    <div className="w-[100vw] h-[100vh] !bg-black">
       <div
-        className={themeClass}
+        className={`${themeClass}`}
         style={{
           flex: 1,
           position: "relative",
@@ -32,6 +32,7 @@ export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
           marginLeft: "auto",
           marginRight: "auto",
           borderRadius: "20px",
+          zIndex: 0,
         }}
       >
         <div style={{ flex: 1 }}>
@@ -63,8 +64,8 @@ export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
               </span>
               <button
                 onClick={() => {
-                  nav("/profile")
-                  setCurrentScreen("Profile")
+                  nav("/profile");
+                  setCurrentScreen("Profile");
                 }}
                 className="ml-auto mr-5"
               >
@@ -88,5 +89,5 @@ export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
         />
       </div>
     </div>
-  )
+  );
 }

@@ -1,25 +1,25 @@
-import { useParams } from "@remix-run/react"
-import { useEffect, useState } from "react"
-import { demoTextMsgs } from "./../DemoData"
+import { useEffect, useState } from "react";
+import { demoTextMsgs } from "../DemoData";
+import { useParams } from "react-router";
 
 export default function ChatsDetail() {
-  const { id } = useParams()
-  const [inputValue, setInputValue] = useState("")
+  const { id } = useParams();
+  const [inputValue, setInputValue] = useState("");
   const [textmsgs, setTextMsgs] = useState<
     {
-      id: number
-      sender: string
-      message: string
-      timestamp: number
+      id: number;
+      sender: string;
+      message: string;
+      timestamp: number;
     }[]
-  >(demoTextMsgs)
+  >(demoTextMsgs);
 
   useEffect(() => {
-    const div = document.getElementById("scroll")
+    const div = document.getElementById("scroll");
     if (div) {
-      div.scrollTop = div.scrollHeight
+      div.scrollTop = div.scrollHeight;
     }
-  }, [textmsgs])
+  }, [textmsgs]);
 
   return (
     <div
@@ -61,7 +61,7 @@ export default function ChatsDetail() {
                 <span className="max-w-full break-words">{msg.message}</span>
               </div>
             </div>
-          )
+          );
         })}
       </div>
       <div className="mt-2 ml-2 w-full items-center justify-center flex">
@@ -80,7 +80,7 @@ export default function ChatsDetail() {
           placeholder="Input..."
           value={inputValue}
           onChange={(e) => {
-            setInputValue(e.currentTarget.value)
+            setInputValue(e.currentTarget.value);
           }}
         />
         <div
@@ -100,7 +100,7 @@ export default function ChatsDetail() {
               color: "#007AFF",
             }}
             onClick={() => {
-              if (!inputValue || inputValue.length === 0) return
+              if (!inputValue || inputValue.length === 0) return;
               setTextMsgs((prev) => [
                 ...prev,
                 {
@@ -109,8 +109,8 @@ export default function ChatsDetail() {
                   timestamp: Date.now(),
                   id: prev.length + 1,
                 },
-              ])
-              setInputValue("")
+              ]);
+              setInputValue("");
             }}
           >
             {">"}
@@ -118,5 +118,5 @@ export default function ChatsDetail() {
         </div>
       </div>
     </div>
-  )
+  );
 }
