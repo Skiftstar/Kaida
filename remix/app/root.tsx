@@ -1,16 +1,20 @@
 import {
+  data,
   Links,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react"
-import type { LinksFunction } from "@remix-run/node"
+import type { LinksFunction, LoaderFunctionArgs } from "@remix-run/node"
 
 import "./index.css"
 import "./tailwind.css"
 import { SideLayout } from "~/components/Layout"
 import { useState } from "react"
+import { getCurrentUser } from "./util/Api"
 
 export const links: LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -43,8 +47,24 @@ export function Layout({ children }: { children: React.ReactNode }) {
   )
 }
 
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await getCurrentUser()
+
+  const url = new URL(request.url)
+  const pathname = url.pathname
+  if (pathname.includes("/login")) {
+    return data({ user: null })
+  }
+
+  // if (!user) {
+  //   return redirect("/login")
+  // }
+
+  return data({ user })
+}
+
 export default function App() {
-  const [user, setUser] = useState({  })
+  const { user } = useLoaderData<typeof loader>()
 
   return (
     <div>

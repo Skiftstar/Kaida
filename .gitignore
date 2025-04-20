@@ -47,3 +47,5 @@ dist/
 # TypeScript build output
 *.js
 *.js.map
+
+python/flask/sessions/*

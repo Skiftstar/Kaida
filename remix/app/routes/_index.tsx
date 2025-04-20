@@ -1,6 +1,6 @@
 import type { MetaFunction } from "@remix-run/node"
 import { useNavigate } from "@remix-run/react"
-import { formatDate } from "~/util/DateUtil"
+import { formatDate } from "./../util/DateUtil"
 
 export const meta: MetaFunction = () => {
   return [

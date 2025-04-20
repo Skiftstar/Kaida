@@ -1,6 +1,6 @@
 import { useParams } from "@remix-run/react"
 import { useEffect, useState } from "react"
-import { demoTextMsgs } from "~/DemoData"
+import { demoTextMsgs } from "./../DemoData"
 
 export default function ChatsDetail() {
   const { id } = useParams()

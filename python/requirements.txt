@@ -6,4 +6,6 @@ numpy==1.23.5
 Flask==3.1.0
 Flask-Cors==5.0.1
 Flask-Login==0.6.3
+Flask-Session==0.8.0
+cachelib==0.13.0
 Werkzeug==3.1.3
