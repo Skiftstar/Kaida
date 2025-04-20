@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.theme-light {
+  --color-text: #000;
+  --background-color: #fff;
+  --textinput-background-color: #e8e8e8;
+  --usermessage-background-color: #e0f7fa;
+  --botmessage-background-color: #f1f8e9;
+}
+
+.theme-dark {
+  --color-text: #fff;
+  --background-color: #000;
+  --textinput-background-color: #333;
+  --usermessage-background-color: #1e88e5;
+  --botmessage-background-color: #424242;
+}
+
+div {
+  background-color: var(--background-color);
+  color: var(--color-text);
+}
+
+span {
+  color: var(--color-text);
+}
+
+.textInput {
+  background-color: var(--textinput-background-color);
+  color: var(--color-text);
+  font-size: 32px;
+}
+
+input {
+  color: var(--color-text);
+  font-size: 32px;
+}
+
+.userMessage {
+  background-color: var(--usermessage-background-color);
+}
+
+.botMessage {
+  background-color: var(--botmessage-background-color);
+}
