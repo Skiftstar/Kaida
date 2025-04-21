@@ -1,3 +1,4 @@
+import type { User } from "~/types"
 import { get, post } from "./Axios"
 
 export const login = async (
@@ -17,7 +18,7 @@ export const login = async (
   return { username: data.username, userId: data.id }
 }
 
-export const getCurrentUser = async () => {
+export const getCurrentUser = async (): Promise<User | undefined> => {
   const response = await get("/@me")
 
   console.log(response)
@@ -27,5 +28,5 @@ export const getCurrentUser = async () => {
   }
 
   const data = await response.data
-  return { username: data.username, userId: data.id }
+  return { username: data.username, userId: data.id, email: data.email }
 }

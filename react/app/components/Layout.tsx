@@ -1,11 +1,15 @@
 import { useState } from "react"
 import { Navbar } from "./Navbar/Navbar.js"
 import { Outlet, useNavigate } from "react-router"
+import { useUser } from "~/contexts/UserContext.js"
 
-export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
+export function SideLayout() {
   const [isDark, setIsDark] = useState(false)
   const [navbarOpen, setNavbarOpen] = useState(false)
   const [currentScreen, setCurrentScreen] = useState("Chats")
+
+  const { user } = useUser()
+  const isLoggedIn = user !== undefined
 
   const nav = useNavigate()
 

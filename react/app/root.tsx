@@ -14,6 +14,8 @@ import "./index.css"
 import { SideLayout } from "./components/Layout"
 import { useEffect, useState } from "react"
 import { getCurrentUser } from "./util/Api"
+import { UserContext } from "./contexts/UserContext"
+import type { User } from "./types"
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -47,13 +49,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const [user, setUser] = useState<
-    | {
-        username: string
-        userId: string
-      }
-    | undefined
-  >(undefined)
+  const [user, setUser] = useState<User | undefined>(undefined)
   const [initialized, setInitialized] = useState(false)
 
   const nav = useNavigate()
@@ -77,9 +73,9 @@ export default function App() {
   }
 
   return initialized ? (
-    <div>
-      <SideLayout isLoggedIn={!!user} />
-    </div>
+    <UserContext.Provider value={{ user, setUser }}>
+      <SideLayout />
+    </UserContext.Provider>
   ) : (
     <div></div>
   )

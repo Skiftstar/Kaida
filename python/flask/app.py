@@ -65,7 +65,7 @@ def create_app():
             login_user(user, remember=True)
             session["user_id"] = user.id
             print(session)
-            return dict(id=user.id, username=username), 200
+            return dict(id=user.id), 200
         return 'Invalid credentials', 401
         
     @app.route('/logout', methods=['POST'])
@@ -76,7 +76,7 @@ def create_app():
 
     @app.route('/@me', methods=['GET'])
     def current_user_route():
-        return dict(id=current_user.id, username=current_user.username), 200
+        return dict(id=current_user.id, username=current_user.username, email=current_user.email), 200
 
 
     diagnosis_bp.register_blueprint(diagonosis_emb_bp, url_prefix="/<id>/embeddings")
