@@ -2,11 +2,12 @@ import { useState } from "react"
 import { Navbar } from "./Navbar/Navbar.js"
 import { Outlet, useNavigate } from "react-router"
 import { useUser } from "~/contexts/UserContext.js"
+import { PageContext } from "~/contexts/PageContext.js"
 
 export function SideLayout() {
   const [isDark, setIsDark] = useState(false)
   const [navbarOpen, setNavbarOpen] = useState(false)
-  const [currentScreen, setCurrentScreen] = useState("Chats")
+  const [currentScreen, setCurrentScreen] = useState("")
 
   const { user } = useUser()
   const isLoggedIn = user !== undefined
@@ -85,7 +86,11 @@ export function SideLayout() {
               </button>
             </div>
           )}
-          <Outlet />
+          <PageContext.Provider
+            value={{ currPage: currentScreen, setCurrPage: setCurrentScreen }}
+          >
+            <Outlet />
+          </PageContext.Provider>
         </div>
 
         {navbarOpen && (

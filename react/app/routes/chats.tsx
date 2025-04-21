@@ -1,5 +1,6 @@
 import { useNavigate, type MetaFunction } from "react-router"
 import { formatDate } from "./../util/DateUtil"
+import { usePage } from "~/contexts/PageContext"
 
 export const meta: MetaFunction = () => {
   return [
@@ -10,6 +11,9 @@ export const meta: MetaFunction = () => {
 
 export default function Index() {
   const nav = useNavigate()
+
+  const { setCurrPage } = usePage()
+  setCurrPage("Chats")
 
   const chats = [
     {
