@@ -23,6 +23,10 @@ span {
   color: var(--color-text);
 }
 
+button {
+  cursor: pointer;
+}
+
 .textInput {
   background-color: var(--textinput-background-color);
   color: var(--color-text);

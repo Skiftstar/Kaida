@@ -1,23 +1,23 @@
-import { useState } from "react";
-import { Navbar } from "./Navbar/Navbar.js";
-import { Outlet, useNavigate } from "react-router";
+import { useState } from "react"
+import { Navbar } from "./Navbar/Navbar.js"
+import { Outlet, useNavigate } from "react-router"
 
 export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const [isDark, setIsDark] = useState(false);
-  const [navbarOpen, setNavbarOpen] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState("Chats");
+  const [isDark, setIsDark] = useState(false)
+  const [navbarOpen, setNavbarOpen] = useState(false)
+  const [currentScreen, setCurrentScreen] = useState("Chats")
 
-  const nav = useNavigate();
+  const nav = useNavigate()
 
-  const themeClass = isDark ? "theme-dark" : "theme-light";
+  const themeClass = isDark ? "theme-dark" : "theme-light"
 
   const toggleTheme = () => {
-    setIsDark((prev) => !prev);
-  };
+    setIsDark((prev) => !prev)
+  }
 
   const toggleNavbar = () => {
-    setNavbarOpen((prev) => !prev);
-  };
+    setNavbarOpen((prev) => !prev)
+  }
 
   return (
     <div className="w-[100vw] h-[100vh] !bg-black">
@@ -64,8 +64,8 @@ export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
               </span>
               <button
                 onClick={() => {
-                  nav("/profile");
-                  setCurrentScreen("Profile");
+                  nav("/profile")
+                  setCurrentScreen("Profile")
                 }}
                 className="ml-auto mr-5"
               >
@@ -80,14 +80,16 @@ export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
           <Outlet />
         </div>
 
-        <Navbar
-          isDark={isDark}
-          toggleTheme={toggleTheme}
-          setCurrentScreen={setCurrentScreen}
-          navbarOpen={navbarOpen}
-          toggleNavbar={toggleNavbar}
-        />
+        {navbarOpen && (
+          <Navbar
+            isDark={isDark}
+            toggleTheme={toggleTheme}
+            setCurrentScreen={setCurrentScreen}
+            navbarOpen={navbarOpen}
+            toggleNavbar={toggleNavbar}
+          />
+        )}
       </div>
     </div>
-  );
+  )
 }

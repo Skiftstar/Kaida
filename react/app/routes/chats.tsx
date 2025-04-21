@@ -3,8 +3,8 @@ import { formatDate } from "./../util/DateUtil"
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "New Remix App" },
-    { name: "description", content: "Welcome to Remix!" },
+    { title: "Kaida" },
+    { name: "description", content: "Welcome to Kaida!" },
   ]
 }
 
