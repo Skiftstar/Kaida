@@ -54,6 +54,7 @@ export default function App() {
       }
     | undefined
   >(undefined)
+  const [initialized, setInitialized] = useState(false)
 
   const nav = useNavigate()
 
@@ -72,12 +73,15 @@ export default function App() {
       nav("/")
     }
     setUser(user)
+    setInitialized(true)
   }
 
-  return (
+  return initialized ? (
     <div>
       <SideLayout isLoggedIn={!!user} />
     </div>
+  ) : (
+    <div></div>
   )
 }
 
