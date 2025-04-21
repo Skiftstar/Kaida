@@ -20,7 +20,11 @@ export function SideLayout({ isLoggedIn }: { isLoggedIn: boolean }) {
   }
 
   return (
-    <div className="w-[100vw] h-[100vh] !bg-black">
+    <div
+      className={`w-[100vw] h-[100vh] ${
+        isDark ? "!bg-[#ffffff]" : "!bg-[#000000]"
+      }`}
+    >
       <div
         className={`${themeClass}`}
         style={{
