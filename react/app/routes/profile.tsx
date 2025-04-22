@@ -4,13 +4,14 @@ import { useUser } from "~/contexts/UserContext"
 export default function ProfileRoute() {
   const { user } = useUser()
 
-    const { setCurrPage } = usePage()
-    setCurrPage("Profile")
+  const { setCurrPage } = usePage()
+  setCurrPage("Profile")
 
   return (
     <div>
       <span>Profile!</span>
       <span>{user?.username}</span>
+      <span>{user?.email}</span>
     </div>
   )
 }

@@ -76,7 +76,10 @@ def create_app():
 
     @app.route('/@me', methods=['GET'])
     def current_user_route():
-        return dict(id=current_user.id, username=current_user.username, email=current_user.email), 200
+        return dict(id=current_user.id, 
+                    username=current_user.username, 
+                    email=current_user.email, 
+                    push_notifications_enabled=current_user.push_notifications), 200
 
 
     diagnosis_bp.register_blueprint(diagonosis_emb_bp, url_prefix="/<id>/embeddings")
