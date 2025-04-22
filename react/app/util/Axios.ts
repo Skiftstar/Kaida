@@ -1,25 +1,25 @@
-import axios from "axios"
+import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 if (!API_URL) {
-  throw new Error("Missing API_URL in .env file")
+  throw new Error("Missing VITE_API_URL in .env file");
 }
 
-axios.defaults.withCredentials = true
+axios.defaults.withCredentials = true;
 axios.interceptors.response.use(
   function (response) {
-    return response
+    return response;
   },
   function (error) {
-    if (!error.response) return
-    return Promise.reject(error)
+    if (!error.response) return;
+    return Promise.reject(error);
   }
-)
+);
 
 export const post = (path: string, body: any) => {
-  return axios.post(API_URL + path, body, { withCredentials: true })
-}
+  return axios.post(API_URL + path, body, { withCredentials: true });
+};
 
 export const get = (path: string) => {
   return axios
@@ -28,18 +28,18 @@ export const get = (path: string) => {
     })
     .catch((error) => {
       if (error.response) {
-        console.error("Error response:", error.response.data)
+        console.error("Error response:", error.response.data);
       } else {
-        console.error("Error:", error.message)
+        console.error("Error:", error.message);
       }
-      return { status: 500, data: null }
-    })
-}
+      return { status: 500, data: null };
+    });
+};
 
 export const del = (path: string) => {
-  return axios.delete(API_URL + path)
-}
+  return axios.delete(API_URL + path);
+};
 
 export const put = (path: string, body: any) => {
-  return axios.put(API_URL + path, body)
-}
+  return axios.put(API_URL + path, body);
+};

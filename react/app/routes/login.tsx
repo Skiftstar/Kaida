@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router"
+import { useUser } from "~/contexts/UserContext"
 import { getCurrentUser, login } from "~/util/Api"
 
 export default function LoginRoute() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
 
+  const { setUser } = useUser()
   const nav = useNavigate()
 
   const handleLogin = async () => {
@@ -16,6 +18,7 @@ export default function LoginRoute() {
       return
     }
 
+    setUser(loginResponse)
     nav("/")
   }
 

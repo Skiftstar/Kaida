@@ -65,10 +65,13 @@ def create_app():
             login_user(user, remember=True)
             session["user_id"] = user.id
             print(session)
-            return dict(id=user.id), 200
+            return dict(id=current_user.id, 
+                    username=current_user.username, 
+                    email=current_user.email, 
+                    push_notifications_enabled=current_user.push_notifications), 200
         return 'Invalid credentials', 401
         
-    @app.route('/logout', methods=['POST'])
+    @app.route('/logout', methods=['GET'])
     def logout():
         logout_user()
         session.pop("user_id", None)
@@ -91,4 +94,4 @@ def create_app():
 
 if __name__ == "__main__":
     app = create_app()
-    app.run(host="0.0.0.0", debug=True, port=5050)
+    app.run(host="0.0.0.0", debug=True, port=5000)

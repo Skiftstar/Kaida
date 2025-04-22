@@ -3,8 +3,8 @@ import { get, post } from "./Axios"
 
 export const login = async (
   username: string,
-  password: string
-): Promise<{ username: string; userId: string } | undefined> => {
+  password: string,
+): Promise<User | undefined> => {
   const response = await post("/login", {
     username,
     password,
@@ -15,18 +15,35 @@ export const login = async (
   }
 
   const data = await response.data
-  return { username: data.username, userId: data.id }
+  return buildUser(data)
 }
 
 export const getCurrentUser = async (): Promise<User | undefined> => {
   const response = await get("/@me")
-
-  console.log(response)
 
   if (response.status !== 200) {
     return undefined
   }
 
   const data = await response.data
-  return { username: data.username, userId: data.id, email: data.email }
+  return buildUser(data)
+}
+
+const buildUser = (data: any): User => {
+  return {
+    username: data.username,
+    userId: data.id,
+    email: data.email,
+    push_notifications_enabled: data.push_notifications_enabled,
+  }
+}
+
+export const logoutUser = async (): Promise<boolean> => {
+  const response = await get("/logout")
+
+  if (response.status !== 200) {
+    return false
+  }
+
+  return true
 }

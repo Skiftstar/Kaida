@@ -51,25 +51,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   const [user, setUser] = useState<User | undefined>(undefined)
   const [initialized, setInitialized] = useState(false)
+  const [initFailed, setInitFailed] = useState(false)
+  const INIT_TIMEOUT = 10000
 
   const nav = useNavigate()
 
   useEffect(() => {
     getCurrUser()
+    setTimeout(() => {
+      if (!initialized) {
+        setInitFailed(true)
+      }
+    }, INIT_TIMEOUT)
   }, [])
 
   const getCurrUser = async () => {
     const user = await getCurrentUser()
+
+    setInitialized(true)
     if (!user) {
       if (window.location.pathname !== "/login") {
         nav("/login")
       }
+      return
     }
     if (window.location.pathname === "/login") {
       nav("/")
     }
     setUser(user)
-    setInitialized(true)
   }
 
   return initialized ? (
@@ -77,7 +86,7 @@ export default function App() {
       <SideLayout />
     </UserContext.Provider>
   ) : (
-    <div></div>
+    <div>{initFailed && <span>Init failed!</span>}</div>
   )
 }
 
