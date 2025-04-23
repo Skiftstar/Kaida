@@ -1,25 +1,47 @@
-import { useEffect, useState } from "react";
-import { demoTextMsgs } from "../DemoData";
-import { useParams } from "react-router";
+import { useEffect, useState } from "react"
+import { useParams } from "react-router"
+import { fetchAllChatMessages, insertNewChatMessage } from "~/util/Api"
+import type { Message } from "~/types"
 
 export default function ChatsDetail() {
-  const { id } = useParams();
-  const [inputValue, setInputValue] = useState("");
-  const [textmsgs, setTextMsgs] = useState<
-    {
-      id: number;
-      sender: string;
-      message: string;
-      timestamp: number;
-    }[]
-  >(demoTextMsgs);
+  const { id } = useParams()
+
+  const [inputValue, setInputValue] = useState("")
+  const [textmsgs, setTextMsgs] = useState<Message[]>([])
 
   useEffect(() => {
-    const div = document.getElementById("scroll");
+    fetchChatMsgs()
+  }, [])
+
+  const fetchChatMsgs = async () => {
+    const messages = await fetchAllChatMessages(Number(id))
+
+    if (!messages) return //TODO: handle error
+
+    setTextMsgs(messages)
+  }
+
+  useEffect(() => {
+    const div = document.getElementById("scroll")
     if (div) {
-      div.scrollTop = div.scrollHeight;
+      div.scrollTop = div.scrollHeight
     }
-  }, [textmsgs]);
+  }, [textmsgs])
+
+  const handleMessageSend = async (message: string) => {
+    const messageId = await insertNewChatMessage("User", message, Number(id))
+
+    if (!messageId) return //TODO: Error handling
+
+    setTextMsgs((old) => [
+      ...old,
+      {
+        id: `${messageId}`,
+        message,
+        sender: "User",
+      },
+    ])
+  }
 
   return (
     <div
@@ -61,7 +83,7 @@ export default function ChatsDetail() {
                 <span className="max-w-full break-words">{msg.message}</span>
               </div>
             </div>
-          );
+          )
         })}
       </div>
       <div className="mt-2 ml-2 w-full items-center justify-center flex">
@@ -80,7 +102,7 @@ export default function ChatsDetail() {
           placeholder="Input..."
           value={inputValue}
           onChange={(e) => {
-            setInputValue(e.currentTarget.value);
+            setInputValue(e.currentTarget.value)
           }}
         />
         <div
@@ -100,17 +122,9 @@ export default function ChatsDetail() {
               color: "#007AFF",
             }}
             onClick={() => {
-              if (!inputValue || inputValue.length === 0) return;
-              setTextMsgs((prev) => [
-                ...prev,
-                {
-                  message: inputValue,
-                  sender: "User",
-                  timestamp: Date.now(),
-                  id: prev.length + 1,
-                },
-              ]);
-              setInputValue("");
+              if (!inputValue || inputValue.length === 0) return
+              handleMessageSend(inputValue)
+              setInputValue("")
             }}
           >
             {">"}
@@ -118,5 +132,5 @@ export default function ChatsDetail() {
         </div>
       </div>
     </div>
-  );
+  )
 }

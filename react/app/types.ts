@@ -8,6 +8,12 @@ export type User = {
 export type Chat = {
   id: number
   title: string
-  last_message: string
+  latest_message: string
   timestamp: number
+}
+
+export type Message = {
+  id: string
+  message: string
+  sender: string
 }

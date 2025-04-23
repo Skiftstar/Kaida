@@ -48,7 +48,7 @@ export default function Index() {
     setChats((old) => [
       {
         id: chat_id,
-        last_message: "",
+        latest_message: "",
         timestamp,
         title: "New Diagnosis",
       },
@@ -66,7 +66,10 @@ export default function Index() {
             <button
               style={{ width: "100%" }}
               key={chat.id}
-              onClick={() => nav(`/chats/${chat.id}`)}
+              onClick={() => {
+                setCurrPage(chat.title)
+                nav(`/chats/${chat.id}`)
+              }}
             >
               <div
                 style={{
@@ -114,7 +117,9 @@ export default function Index() {
                     textAlign: "start",
                   }}
                 >
-                  {chat.lastMessage}
+                  {chat.latest_message.length === 0
+                    ? "empty"
+                    : chat.latest_message}
                 </span>
               </div>
             </button>

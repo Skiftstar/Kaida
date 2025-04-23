@@ -1,13 +1,6 @@
 -- init.sql
 CREATE EXTENSION IF NOT EXISTS vector;
 
-CREATE TABLE embeddings (
-    id SERIAL PRIMARY KEY,
-    text TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT NOW(),
-    embedding vector(384)
-);
-
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
@@ -22,6 +15,14 @@ WHERE NOT EXISTS (
     SELECT 1 FROM users WHERE username = 'admin'
 );
 
+-- permanent embeddings for a user
+CREATE TABLE embeddings (
+    id SERIAL PRIMARY KEY,
+    text TEXT NOT NULL,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    embedding vector(384)
+);
 
 CREATE TABLE diagnoses (
     id SERIAL PRIMARY KEY,
@@ -29,6 +30,8 @@ CREATE TABLE diagnoses (
     title TEXT NOT NULL,
     summary TEXT NOT NULL,
     summary_embedding vector(384),
+    title_custom BOOLEAN DEFAULT FALSE,
+    summary_custom BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
 );
@@ -46,6 +49,14 @@ CREATE TABLE chats (
     diagnosis_id INT REFERENCES diagnoses(id) ON DELETE CASCADE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- stores model responses and system prompts used
+CREATE TABLE prompt_history (
+    id SERIAL PRIMARY KEY,
+    chat_id INT REFERENCES chats(id) ON DELETE CASCADE,
+    sender TEXT NOT NULL,
+    message TEXT NOT NULL
 );
 
 CREATE TABLE chat_messages (

@@ -1,26 +1,44 @@
 from . import chats_bp
 from flask_login import login_required, current_user
-from db import get_db_connection, execute_and_fetch_query
+from db import get_db_connection, execute_and_fetchone_query, execute_and_fetchall_query
 from flask import jsonify, request
+
 
 @login_required
 @chats_bp.route("get-user-chats", methods=["GET"])
 def getAllChatsFromUser():
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
+    rows = execute_and_fetchall_query("""
+        SELECT 
+            chats.id, 
+            chats.diagnosis_id, 
+            diagnoses.title, 
+            chats.updated_at,
+            COALESCE(latest_messages.message, '') AS latest_message
+        FROM chats
+        JOIN diagnoses ON chats.diagnosis_id = diagnoses.id
+        LEFT JOIN (
+            SELECT DISTINCT ON (chat_id)
+                chat_id, message
+            FROM chat_messages
+            ORDER BY chat_id, created_at DESC
+        ) AS latest_messages ON chats.id = latest_messages.chat_id
+        WHERE chats.user_id = %s
+        ORDER BY chats.updated_at DESC
+    """, (current_user.id,))
 
-        cur.execute("SELECT chats.id, chats.diagnosis_id, diagnoses.title, chats.updated_at FROM chats JOIN diagnoses ON chats.diagnosis_id = diagnoses.id WHERE chats.user_id = %s ORDER BY chats.updated_at DESC", (f"{current_user.id}",))
+    if not rows:
+        return jsonify("error fetching chats"), 500
 
-        rows = cur.fetchall()
-        cur.close()
-        conn.close()
+    chats = [{
+        "id": row[0],
+        "title": row[2],
+        "diagnosis_id": row[1],
+        "timestamp": row[3],
+        "latest_message": row[4] or ""  # fallback to empty string just in case
+    } for row in rows]
 
-        chats = [{"id": row[0], "title": row[2], "diagnosis_id": row[1], "timestamp": row[3]} for row in rows]
-        print(chats)
-        return jsonify({"chats": chats}), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify({"chats": chats}), 200
+
 
 @login_required
 @chats_bp.route("insert", methods=["POST"])
@@ -28,9 +46,39 @@ def createNewChat():
     data = request.json
     diagnosis_id = data.get("diagnosis_id")
 
-    chat_id = execute_and_fetch_query("INSERT INTO chats (user_id, diagnosis_id) VALUES (%s, %s) RETURNING id", (current_user.id, diagnosis_id))
+    chat_id = execute_and_fetchone_query("INSERT INTO chats (user_id, diagnosis_id) VALUES (%s, %s) RETURNING id", (current_user.id, diagnosis_id))
    
     if not chat_id:
         return jsonify("error creating chat"), 500
 
     return jsonify({"id": chat_id}), 201
+
+@login_required
+@chats_bp.route("<id>/get-messages", methods=["GET"])
+def get_all_messages_of_chat(id):
+   rows = execute_and_fetchall_query("SELECT id, message, sender FROM chat_messages WHERE chat_id=%s ORDER BY created_at ASC", (id))
+
+   if not rows:
+       return jsonify("error fetching chat messages"), 500
+   
+   messages = [{
+       "id": row[0],
+       "message": row[1],
+       "sender": row[2],
+   } for row in rows]
+
+   return jsonify({"messages": messages}), 200
+
+@login_required
+@chats_bp.route("<id>/insert", methods=["POST"])
+def insert_message_into_chat(id):
+    data = request.json
+    message = data.get("message")
+    sender = data.get("sender")
+
+    message_id = execute_and_fetchone_query("INSERT INTO chat_messages (message, sender, chat_id) VALUES (%s, %s, %s) RETURNING id", (message, sender, id))
+
+    if not message_id:
+        return jsonify("error creating chatmessage"), 500
+
+    return jsonify({"id": message_id}), 201
