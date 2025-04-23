@@ -25,6 +25,7 @@ WHERE NOT EXISTS (
 
 CREATE TABLE diagnoses (
     id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     summary TEXT NOT NULL,
     summary_embedding vector(384),

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router"
 import { useUser } from "~/contexts/UserContext"
-import { getCurrentUser, login } from "~/util/Api"
+import { login } from "~/util/Api"
 
 export default function LoginRoute() {
   const [username, setUsername] = useState("")
@@ -37,7 +37,7 @@ export default function LoginRoute() {
       </div>
       <div className="m-4 flex flex-col gap-2">
         <input
-          className="textInput text-xl rounded p-2 w-full max-w-md pointer-events-auto"
+          className="textInput !text-lg rounded p-2 w-full max-w-md pointer-events-auto"
           placeholder="Username"
           type="text"
           name="username"
@@ -45,18 +45,23 @@ export default function LoginRoute() {
           value={username}
         />
         <input
-          className="textInput text-lg rounded p-2 w-full max-w-md pointer-events-auto"
+          className="textInput !text-lg rounded p-2 w-full max-w-md pointer-events-auto"
           placeholder="Password"
           type="password"
           name="password"
           onChange={(e) => setPassword(e.target.value)}
           value={password}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleLogin()
+            }
+          }}
         />
       </div>
       <div className="mt-auto w-full">
         <button
           onClick={handleLogin}
-          className="w-full h-12 bg-blue-500 text-white pointer-events-auto"
+          className="w-full h-12 font-bold bg-blue-500 text-white pointer-events-auto"
         >
           Login
         </button>

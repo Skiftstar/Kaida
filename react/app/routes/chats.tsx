@@ -1,6 +1,13 @@
 import { useNavigate, type MetaFunction } from "react-router"
 import { formatDate } from "./../util/DateUtil"
 import { usePage } from "~/contexts/PageContext"
+import { useEffect, useState } from "react"
+import {
+  createNewDiagnosis,
+  getAllChatsOfUser,
+  createNewChat,
+} from "~/util/Api"
+import type { Chat } from "~/types"
 
 export const meta: MetaFunction = () => {
   return [
@@ -12,36 +19,48 @@ export const meta: MetaFunction = () => {
 export default function Index() {
   const nav = useNavigate()
 
+  const [chats, setChats] = useState<Chat[]>([])
+
   const { setCurrPage } = usePage()
   setCurrPage("Chats")
 
-  const chats = [
-    {
-      id: 1,
-      title: "Veeeeeeery long title wawawawawawawawabebebebebebebe",
-      lastMessage:
-        "Hello, this is a long message that should be truncated if it is too long",
-      timestamp: 1744359120,
-    },
-    {
-      id: 2,
-      title: "Chat 2",
-      lastMessage: "This is a short message",
-      timestamp: 1743495120,
-    },
-    {
-      id: 3,
-      title: "Veeeeeeery long title wawawawawawawawabebebebebebebe",
-      lastMessage: "Another message here",
-      timestamp: 1733821920,
-    },
-  ]
+  useEffect(() => {
+    fetchChats()
+  }, [])
+
+  const fetchChats = async () => {
+    const chats = await getAllChatsOfUser()
+    setChats(chats)
+  }
+
+  const handleNewChat = async () => {
+    const diagnosis_id = await createNewDiagnosis(
+      "New Diagnosis",
+      "New Diagnosis",
+    )
+    if (!diagnosis_id) return //TODO: Show error
+
+    const chat_id = await createNewChat(diagnosis_id)
+    if (!chat_id) return //TODO: Cleanup diagnosis, dispaly error
+
+    const timestamp = Date.now()
+
+    setChats((old) => [
+      ...old,
+      {
+        id: chat_id,
+        last_message: "",
+        timestamp,
+        title: "New Diagnosis",
+      },
+    ])
+  }
 
   return (
-    <div>
-      <div>
+    <div className="flex flex-col h-[calc(100vh-65px)]">
+      <div className="overflow-scroll">
         {chats.map((chat) => {
-          const date = formatDate(new Date(chat.timestamp * 1000))
+          const date = formatDate(new Date(chat.timestamp))
           // const date = "";
           return (
             <button
@@ -101,6 +120,14 @@ export default function Index() {
             </button>
           )
         })}
+      </div>
+      <div className="mt-auto w-full">
+        <button
+          onClick={handleNewChat}
+          className="w-full h-12 font-bold bg-blue-500 text-white pointer-events-auto"
+        >
+          New Chat
+        </button>
       </div>
     </div>
   )

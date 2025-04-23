@@ -1,4 +1,4 @@
-import type { User } from "~/types"
+import type { Chat, User } from "~/types"
 import { get, post } from "./Axios"
 
 export const login = async (
@@ -46,4 +46,41 @@ export const logoutUser = async (): Promise<boolean> => {
   }
 
   return true
+}
+
+export const getAllChatsOfUser = async (): Promise<Chat[]> => {
+  const response = await get("/chats/get-user-chats")
+
+  if (response.status !== 200) {
+    return []
+  }
+
+  return response.data.chats
+}
+
+export const createNewDiagnosis = async (
+  title: string,
+  summary: string,
+): Promise<number | undefined> => {
+  const response = await post("/diagnosis/insert", { title, summary })
+
+  if (response.status !== 201) {
+    return undefined
+  }
+
+  return response.data.id
+}
+
+export const createNewChat = async (
+  diagnosisId: number,
+): Promise<number | undefined> => {
+  const response = await post("/chats/insert", {
+    diagnosis_id: diagnosisId,
+  })
+
+  if (response.status !== 201) {
+    return undefined
+  }
+
+  return response.data.id
 }

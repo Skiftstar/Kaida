@@ -30,7 +30,6 @@ button {
 .textInput {
   background-color: var(--textinput-background-color);
   color: var(--color-text);
-  font-size: 32px;
 }
 
 input {

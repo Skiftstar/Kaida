@@ -1,5 +1,5 @@
 from flask import Flask, request, session, Response
-from routes import embeddings_bp, diagnosis_bp, diagonosis_emb_bp
+from routes import embeddings_bp, diagnosis_bp, diagonosis_emb_bp, chats_bp
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from models import User
 from werkzeug.security import check_password_hash
@@ -38,9 +38,6 @@ def create_app():
     @app.before_request
     def check_valid_login():
         user_id = session.get("user_id")
-        print(request.cookies.get("session"))
-        print(session)
-        print(user_id) 
         login_valid = is_logged_in(user_id)
 
         if (request.endpoint and
@@ -64,7 +61,6 @@ def create_app():
         if user and check_password_hash(user.password, password):
             login_user(user, remember=True)
             session["user_id"] = user.id
-            print(session)
             return dict(id=current_user.id, 
                     username=current_user.username, 
                     email=current_user.email, 
@@ -88,6 +84,7 @@ def create_app():
     diagnosis_bp.register_blueprint(diagonosis_emb_bp, url_prefix="/<id>/embeddings")
     app.register_blueprint(embeddings_bp, url_prefix="/embeddings")
     app.register_blueprint(diagnosis_bp, url_prefix="/diagnosis")
+    app.register_blueprint(chats_bp, url_prefix="/chats")
 
     return app
 

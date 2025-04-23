@@ -48,9 +48,9 @@ export default function ProfileRoute() {
       <div className="w-full mt-auto">
         <button
           onClick={handleLogout}
-          className="w-full h-12 bg-red-500 text-white pointer-events-auto"
+          className="w-full font-bold h-12 bg-red-500 text-white pointer-events-auto"
         >
-          Log out!
+          Logout
         </button>
       </div>
     </div>

@@ -2,6 +2,7 @@ from . import diagnosis_bp
 from db import get_db_connection
 from flask import request, jsonify
 from sentence_transformer import model
+from flask_login import login_required, current_user
 
 @diagnosis_bp.route("recent-diagnoses", methods=["GET"])
 def get_past_diagnoses():
@@ -22,6 +23,7 @@ def get_past_diagnoses():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@login_required
 @diagnosis_bp.route("insert", methods=["POST"])
 def insert_diagnosis():
     """Insert a new diagnosis into the database and return its ID"""
@@ -40,8 +42,8 @@ def insert_diagnosis():
 
         embedding = model.encode(summary).tolist()
         cur.execute(
-            "INSERT INTO diagnoses (title, summary, summary_embedding) VALUES (%s, %s, %s) RETURNING id",
-            (title, summary, embedding)
+            "INSERT INTO diagnoses (title, summary, summary_embedding, user_id) VALUES (%s, %s, %s, %s) RETURNING id",
+            (title, summary, embedding, f"{current_user.id}")
         )
         diagnosis_id = cur.fetchone()[0]  # Fetch the generated ID
         conn.commit()
