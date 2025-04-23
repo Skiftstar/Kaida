@@ -46,13 +46,13 @@ export default function Index() {
     const timestamp = Date.now()
 
     setChats((old) => [
-      ...old,
       {
         id: chat_id,
         last_message: "",
         timestamp,
         title: "New Diagnosis",
       },
+      ...old,
     ])
   }
 
