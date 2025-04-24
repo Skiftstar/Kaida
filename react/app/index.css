@@ -4,6 +4,7 @@
   --textinput-background-color: #e8e8e8;
   --usermessage-background-color: #e0f7fa;
   --botmessage-background-color: #f1f8e9;
+  --systemmessage-background-color: #f4f4f4;
 }
 
 .theme-dark {
@@ -12,6 +13,7 @@
   --textinput-background-color: #333;
   --usermessage-background-color: #1e88e5;
   --botmessage-background-color: #424242;
+  --systemmessage-background-color: #404040;
 }
 
 div {
@@ -43,4 +45,9 @@ input {
 
 .botMessage {
   background-color: var(--botmessage-background-color);
+}
+
+.systemMessage {
+  background-color: var(--systemmessage-background-color);
+  border-radius: 0px !important;
 }

@@ -12,6 +12,12 @@ export type Chat = {
   timestamp: number
 }
 
+export type ChatInfo = {
+  id: number
+  title: string
+  diagnosis_id: number
+}
+
 export type Message = {
   id: string
   message: string

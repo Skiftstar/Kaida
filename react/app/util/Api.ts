@@ -1,13 +1,13 @@
-import type { Chat, Message, User } from "~/types"
-import { get, post } from "./Axios"
+import type { Chat, ChatInfo, Message, User } from '~/types'
+import { get, post } from './Axios'
 
 export const login = async (
   username: string,
-  password: string,
+  password: string
 ): Promise<User | undefined> => {
-  const response = await post("/login", {
+  const response = await post('/login', {
     username,
-    password,
+    password
   })
 
   if (response.status !== 200) {
@@ -19,7 +19,7 @@ export const login = async (
 }
 
 export const getCurrentUser = async (): Promise<User | undefined> => {
-  const response = await get("/@me")
+  const response = await get('/@me')
 
   if (response.status !== 200) {
     return undefined
@@ -34,12 +34,12 @@ const buildUser = (data: any): User => {
     username: data.username,
     userId: data.id,
     email: data.email,
-    push_notifications_enabled: data.push_notifications_enabled,
+    push_notifications_enabled: data.push_notifications_enabled
   }
 }
 
 export const logoutUser = async (): Promise<boolean> => {
-  const response = await get("/logout")
+  const response = await get('/logout')
 
   if (response.status !== 200) {
     return false
@@ -49,7 +49,7 @@ export const logoutUser = async (): Promise<boolean> => {
 }
 
 export const getAllChatsOfUser = async (): Promise<Chat[]> => {
-  const response = await get("/chats/get-user-chats")
+  const response = await get('/chats/get-user-chats')
 
   if (response.status !== 200) {
     return []
@@ -60,9 +60,9 @@ export const getAllChatsOfUser = async (): Promise<Chat[]> => {
 
 export const createNewDiagnosis = async (
   title: string,
-  summary: string,
+  summary: string
 ): Promise<number | undefined> => {
-  const response = await post("/diagnosis/insert", { title, summary })
+  const response = await post('/diagnosis/insert', { title, summary })
 
   if (response.status !== 201) {
     return undefined
@@ -72,10 +72,10 @@ export const createNewDiagnosis = async (
 }
 
 export const createNewChat = async (
-  diagnosisId: number,
+  diagnosisId: number
 ): Promise<number | undefined> => {
-  const response = await post("/chats/insert", {
-    diagnosis_id: diagnosisId,
+  const response = await post('/chats/insert', {
+    diagnosis_id: diagnosisId
   })
 
   if (response.status !== 201) {
@@ -86,7 +86,7 @@ export const createNewChat = async (
 }
 
 export const fetchAllChatMessages = async (
-  chatId: number,
+  chatId: number
 ): Promise<Message[] | undefined> => {
   const response = await get(`/chats/${chatId}/get-messages`)
 
@@ -97,14 +97,24 @@ export const fetchAllChatMessages = async (
   return response.data.messages
 }
 
+export const getCoreChatInfo = async (
+  chatId: number
+): Promise<ChatInfo | undefined> => {
+  const response = await get(`/chats/${chatId}/core-info`)
+
+  if (response.status !== 200) return undefined
+
+  return response.data
+}
+
 export const insertNewChatMessage = async (
-  sender: "User" | "Bot",
+  sender: 'User' | 'Bot' | 'System',
   message: string,
-  chatId: number,
+  chatId: number
 ): Promise<number | undefined> => {
   const response = await post(`/chats/${chatId}/insert`, {
     sender,
-    message,
+    message
   })
 
   if (response.status !== 201) {
@@ -112,4 +122,51 @@ export const insertNewChatMessage = async (
   }
 
   return response.data.id
+}
+
+export const getRecentDiagnoses = async (amount: number = 5) => {
+  const response = await get(`/diagnosis/recent-diagnoses?count=${amount}`)
+
+  if (response.status !== 200) return undefined
+
+  return response.data
+}
+
+export const searchEmbeddings = async (searchTerms: string[]) => {
+  const params = new URLSearchParams()
+  searchTerms.forEach((term) => {
+    params.append('terms', term)
+  })
+  const response = await get(`/embeddings/search-many?${params.toString()}`)
+
+  if (response.status !== 200) return undefined
+
+  return response.data
+}
+
+export const storeKeyPermanentInfo = async (keyInfo: string[]) => {
+  console.log(keyInfo)
+  const response = await post(`/embeddings/insert-many`, {
+    texts: keyInfo
+  })
+
+  if (response.status !== 201) return undefined
+
+  return response.data
+}
+
+export const storeKeyDiagnosisInfo = async (
+  keyInfo: string[],
+  diagnosisId: number
+) => {
+  const response = await post(
+    `/diagnosis/${diagnosisId}/embeddings/insert-many`,
+    {
+      texts: keyInfo
+    }
+  )
+
+  if (response.status !== 201) return undefined
+
+  return response.data
 }

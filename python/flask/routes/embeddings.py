@@ -3,7 +3,9 @@ from datetime import datetime, timezone
 from sentence_transformer import model
 from db import get_db_connection
 from . import embeddings_bp 
+from flask_login import login_required, current_user
 
+@login_required
 @embeddings_bp.route("insert", methods=["POST"])
 def insert_embedding():
     """Insert a new text embedding into the database."""
@@ -18,7 +20,7 @@ def insert_embedding():
         cur = conn.cursor()
 
         # Check if text exists
-        cur.execute("SELECT 1 FROM embeddings WHERE text = %s;", (text,))
+        cur.execute("SELECT 1 FROM embeddings WHERE text = %s AND user_id = %s;", (text, current_user.id))
         if cur.fetchone():
             cur.close()
             conn.close()
@@ -27,7 +29,7 @@ def insert_embedding():
         # Compute embedding
         embedding = model.encode(text).tolist()
 
-        cur.execute("INSERT INTO embeddings (text, embedding) VALUES (%s, %s)", (text, embedding))
+        cur.execute("INSERT INTO embeddings (text, embedding, user_id) VALUES (%s, %s, %s)", (text, embedding, current_user.id))
         conn.commit()
         cur.close()
         conn.close()
@@ -38,6 +40,7 @@ def insert_embedding():
         return jsonify({"error": str(e)}), 500
     
 
+@login_required
 @embeddings_bp.route("insert-many", methods=["POST"])
 def insert_many_embeddings():
     """Insert multiple text embeddings into the database."""
@@ -59,13 +62,12 @@ def insert_many_embeddings():
             cur.execute("""
             SELECT text, embedding <=> %s::vector AS distance
             FROM embeddings
+            WHERE user_id = %s
             ORDER BY distance
             LIMIT %s;
-            """, (query_vector, 1))
+            """, (query_vector, current_user.id, 1))
 
             results = [{"text": row[0], "distance": row[1]} for row in cur.fetchall()]
-
-            print(f"Results for text '{text}': {results}")
 
             if len(results) > 0 and results[0]["distance"] < 0.1:
                 print(f"Similiar text to '{text}' already exists in the database: {results[0]['text']}")
@@ -75,7 +77,7 @@ def insert_many_embeddings():
 
         for text in to_insert:
             embedding = model.encode(text).tolist()
-            cur.execute("INSERT INTO embeddings (text, embedding) VALUES (%s, %s)", (text, embedding))
+            cur.execute("INSERT INTO embeddings (text, embedding, user_id) VALUES (%s, %s, %s)", (text, embedding, current_user.id))
             conn.commit()
 
         cur.close()
@@ -88,6 +90,7 @@ def insert_many_embeddings():
         return jsonify({"error": str(e)}), 500
     
 
+@login_required
 @embeddings_bp.route("search", methods=["GET"])
 def search_similar():
     """Search for similar embeddings in the database."""
@@ -105,9 +108,10 @@ def search_similar():
         cur.execute("""
             SELECT text, embedding <=> %s::vector AS distance
             FROM embeddings
+            WHERE user_id = %s
             ORDER BY distance
             LIMIT %s;
-        """, (query_vector, top_n))
+        """, (query_vector, current_user.id, top_n))
 
         results = [{"text": row[0], "distance": row[1]} for row in cur.fetchall()]
         cur.close()
@@ -118,7 +122,7 @@ def search_similar():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
+@login_required
 @embeddings_bp.route("search-many", methods=["GET"])
 def search_similar_many():
     query_terms = request.args.getlist("terms")
@@ -136,9 +140,10 @@ def search_similar_many():
             cur.execute("""
                 SELECT text, embedding <=> %s::vector AS distance
                 FROM embeddings
+                WHERE user_id = %s
                 ORDER BY distance
                 LIMIT %s;
-            """, (query_vector, 1))
+            """, (query_vector, current_user.id, 1))
 
             row = cur.fetchone()
             if row:

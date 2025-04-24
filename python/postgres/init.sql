@@ -77,6 +77,16 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION update_chat_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE chats
+    SET updated_at = NOW()
+    WHERE id = NEW.chat_id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE TRIGGER trigger_update_on_embedding_insert
 AFTER INSERT OR UPDATE ON diagnosis_embeddings
 FOR EACH ROW
@@ -86,3 +96,8 @@ CREATE TRIGGER trigger_update_on_summary_change
 BEFORE UPDATE OF summary ON diagnoses
 FOR EACH ROW
 EXECUTE FUNCTION update_diagnosis_updated_at();
+
+CREATE TRIGGER trigger_update_on_chat_message
+AFTER INSERT OR UPDATE ON chat_messages
+FOR EACH ROW
+EXECUTE FUNCTION update_chat_updated_at();

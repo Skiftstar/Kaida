@@ -4,6 +4,7 @@ from flask import request, jsonify
 from sentence_transformer import model
 from flask_login import login_required, current_user
 
+@login_required
 @diagnosis_bp.route("recent-diagnoses", methods=["GET"])
 def get_past_diagnoses():
     """Fetch past X diagnoses from the database"""
@@ -13,7 +14,7 @@ def get_past_diagnoses():
         conn = get_db_connection()
         cur = conn.cursor()
 
-        cur.execute("SELECT id, summary FROM diagnoses ORDER BY created_at DESC LIMIT %s", (count,))
+        cur.execute("SELECT id, summary FROM diagnoses WHERE user_id = %s ORDER BY created_at DESC LIMIT %s", (current_user.id, count,))
         rows = cur.fetchall()
         cur.close()
         conn.close()

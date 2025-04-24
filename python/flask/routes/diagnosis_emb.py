@@ -2,7 +2,9 @@ from . import diagonosis_emb_bp
 from flask import request, jsonify
 from db import get_db_connection
 from sentence_transformer import model
+from flask_login import login_required, current_user
 
+@login_required
 @diagonosis_emb_bp.route("/all", methods=["GET"])
 def get_all_embeddings(id):
     """Fetch all embeddings for a given diagnosis ID"""
@@ -20,6 +22,7 @@ def get_all_embeddings(id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
+@login_required
 @diagonosis_emb_bp.route("/insert", methods=["POST"])
 def insert_embedding(id):
     """Insert a new embedding for a given diagnosis ID"""
@@ -53,7 +56,7 @@ def insert_embedding(id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-
+@login_required
 @diagonosis_emb_bp.route("/insert-many", methods=["POST"])
 def insert_many_embeddings(id):
     """Insert multiple embeddings for a given diagnosis ID"""

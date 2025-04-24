@@ -1,18 +1,20 @@
-import { useNavigate, type MetaFunction } from "react-router"
-import { formatDate } from "./../util/DateUtil"
-import { usePage } from "~/contexts/PageContext"
-import { useEffect, useState } from "react"
+import { useNavigate, type MetaFunction } from 'react-router'
+import { formatDate } from './../util/DateUtil'
+import { usePage } from '~/contexts/PageContext'
+import { useEffect, useState } from 'react'
 import {
   createNewDiagnosis,
   getAllChatsOfUser,
   createNewChat,
-} from "~/util/Api"
-import type { Chat } from "~/types"
+  insertNewChatMessage
+} from '~/util/Api'
+import type { Chat } from '~/types'
+import { NEW_CHAT_MESSAGE } from '~/util/MessageTemplates'
 
 export const meta: MetaFunction = () => {
   return [
-    { title: "Kaida" },
-    { name: "description", content: "Welcome to Kaida!" },
+    { title: 'Kaida' },
+    { name: 'description', content: 'Welcome to Kaida!' }
   ]
 }
 
@@ -22,7 +24,7 @@ export default function Index() {
   const [chats, setChats] = useState<Chat[]>([])
 
   const { setCurrPage } = usePage()
-  setCurrPage("Chats")
+  setCurrPage('Chats')
 
   useEffect(() => {
     fetchChats()
@@ -35,24 +37,26 @@ export default function Index() {
 
   const handleNewChat = async () => {
     const diagnosis_id = await createNewDiagnosis(
-      "New Diagnosis",
-      "New Diagnosis",
+      'New Diagnosis',
+      'New Diagnosis'
     )
     if (!diagnosis_id) return //TODO: Show error
 
     const chat_id = await createNewChat(diagnosis_id)
     if (!chat_id) return //TODO: Cleanup diagnosis, dispaly error
 
+    insertNewChatMessage('System', NEW_CHAT_MESSAGE, chat_id)
+
     const timestamp = Date.now()
 
     setChats((old) => [
       {
         id: chat_id,
-        latest_message: "",
+        latest_message: NEW_CHAT_MESSAGE,
         timestamp,
-        title: "New Diagnosis",
+        title: 'New Diagnosis'
       },
-      ...old,
+      ...old
     ])
   }
 
@@ -64,7 +68,7 @@ export default function Index() {
           // const date = "";
           return (
             <button
-              style={{ width: "100%" }}
+              style={{ width: '100%' }}
               key={chat.id}
               onClick={() => {
                 setCurrPage(chat.title)
@@ -73,34 +77,34 @@ export default function Index() {
             >
               <div
                 style={{
-                  border: "1px solid #ccc",
-                  borderRadius: "5px",
-                  padding: "10px",
-                  margin: "10px",
+                  border: '1px solid #ccc',
+                  borderRadius: '5px',
+                  padding: '10px',
+                  margin: '10px'
                 }}
               >
                 <div
                   style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
                   }}
                 >
                   <span
                     style={{
-                      fontWeight: "bold",
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
+                      fontWeight: 'bold',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
                     }}
                   >
                     {chat.title}
                   </span>
                   <span
                     style={{
-                      color: "#888",
-                      marginLeft: "10px",
-                      whiteSpace: "nowrap",
+                      color: '#888',
+                      marginLeft: '10px',
+                      whiteSpace: 'nowrap'
                     }}
                   >
                     {date}
@@ -108,17 +112,17 @@ export default function Index() {
                 </div>
                 <span
                   style={{
-                    display: "block",
-                    color: "#888",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    marginTop: "5px",
-                    textAlign: "start",
+                    display: 'block',
+                    color: '#888',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    marginTop: '5px',
+                    textAlign: 'start'
                   }}
                 >
                   {chat.latest_message.length === 0
-                    ? "empty"
+                    ? 'empty'
                     : chat.latest_message}
                 </span>
               </div>
