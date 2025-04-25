@@ -66,11 +66,15 @@ export default function ChatsDetail() {
       }
     ])
 
+    const isFirstQuery =
+      textmsgs.filter((msg) => msg.sender === 'Bot').length === 0
+
     const response = await handleUserInput(
       chatSession,
       Number(id),
       message,
-      chatCoreInfo.diagnosis_id
+      chatCoreInfo.diagnosis_id,
+      isFirstQuery
     )
 
     const responseMsgId = await insertNewChatMessage(

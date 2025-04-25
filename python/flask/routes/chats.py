@@ -1,6 +1,6 @@
 from . import chats_bp
 from flask_login import login_required, current_user
-from db import get_db_connection, execute_and_fetchone_query, execute_and_fetchall_query
+from db import execute_and_fetchone_query, execute_and_fetchall_query
 from flask import jsonify, request
 
 
@@ -26,7 +26,7 @@ def getAllChatsFromUser():
         ORDER BY chats.updated_at DESC
     """, (current_user.id,))
 
-    if not rows:
+    if rows is None:
         return jsonify("error fetching chats"), 500
 
     chats = [{

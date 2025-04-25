@@ -170,3 +170,18 @@ export const storeKeyDiagnosisInfo = async (
 
   return response.data
 }
+
+export const addToPromptHistory = async (
+  chatId: number,
+  sender: string,
+  prompt: string
+): Promise<number | undefined> => {
+  const response = await post(`/chats/${chatId}/prompt-history/insert`, {
+    sender,
+    prompt
+  })
+
+  if (response.status !== 201) return undefined
+
+  return response.data.id
+}

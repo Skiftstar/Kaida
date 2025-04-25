@@ -1,5 +1,5 @@
 from flask import Flask, request, session, Response
-from routes import embeddings_bp, diagnosis_bp, diagonosis_emb_bp, chats_bp
+from routes import prompt_history_bp, embeddings_bp, diagnosis_bp, diagonosis_emb_bp, chats_bp
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from models import User
 from werkzeug.security import check_password_hash
@@ -82,6 +82,7 @@ def create_app():
 
 
     diagnosis_bp.register_blueprint(diagonosis_emb_bp, url_prefix="/<id>/embeddings")
+    chats_bp.register_blueprint(prompt_history_bp, url_prefix="/<chat_id>/prompt-history")
     app.register_blueprint(embeddings_bp, url_prefix="/embeddings")
     app.register_blueprint(diagnosis_bp, url_prefix="/diagnosis")
     app.register_blueprint(chats_bp, url_prefix="/chats")

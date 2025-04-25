@@ -5,6 +5,7 @@ import {
   NEW_CHAT_PROMPT
 } from './prompts'
 import {
+  addToPromptHistory,
   getRecentDiagnoses,
   searchEmbeddings,
   storeKeyDiagnosisInfo,
@@ -33,7 +34,8 @@ export const createChatSession = (): ChatSession => {
 
 export async function parseInitialQuery(
   prompt: string,
-  chatSession: ChatSession
+  chatSession: ChatSession,
+  chatId: number
 ): Promise<
   | {
       key_permanent_info: string[]
@@ -57,6 +59,9 @@ export async function parseInitialQuery(
       diagnosis_ids: string[]
     } = JSON.parse(responseText)
 
+    await addToPromptHistory(chatId, 'System', prompt)
+    await addToPromptHistory(chatId, 'Bot', responseText)
+
     return jsonResponse
   } catch (error) {
     console.error('Error generating text:', error)
@@ -66,7 +71,8 @@ export async function parseInitialQuery(
 
 export async function extractInfoFromUserInput(
   input: string,
-  chatSession: ChatSession
+  chatSession: ChatSession,
+  chatId: number
 ): Promise<
   | {
       key_permanent_info: string[]
@@ -89,6 +95,9 @@ export async function extractInfoFromUserInput(
     } = JSON.parse(responseText)
     console.log('keyInfoExtraction', responseText)
 
+    await addToPromptHistory(chatId, 'System', input)
+    await addToPromptHistory(chatId, 'Bot', responseText)
+
     return jsonResponse
   } catch (error) {
     console.error('Error generating text:', error)
@@ -101,7 +110,8 @@ export async function generateUserResponse(
   requestedKnowledgeData: { [term: string]: string },
   diagnosesData: any,
   userQuery: string,
-  chatSession: ChatSession
+  chatSession: ChatSession,
+  chatId: number
 ) {
   const prompt_template = KNOWLEDGE_DATABASE_RESPONSE.replace(
     '{{diagnoses}}',
@@ -115,6 +125,10 @@ export async function generateUserResponse(
 
   const jsonResponse: { response: string } = JSON.parse(responseText)
   console.log('jsonResponse', jsonResponse)
+
+  await addToPromptHistory(chatId, 'System', prompt_template)
+  await addToPromptHistory(chatId, 'Bot', responseText)
+
   return jsonResponse
 }
 
@@ -148,7 +162,8 @@ export const handleUserInput = async (
   if (firstQuery) {
     const { initialQueryInformation } = await handleFirstQuery(
       userInput,
-      chatSession
+      chatSession,
+      chatId
     )
     keyPermanentInfo = initialQueryInformation.key_permanent_info
     keyDiagnosisInfo = initialQueryInformation.key_diagnosis_info
@@ -158,7 +173,8 @@ export const handleUserInput = async (
     const formattedOngoingChatPrompt = formatOngoingChatPrompt(userInput)
     const ongoingQueryInformation = await extractKeyInfo(
       formattedOngoingChatPrompt,
-      chatSession
+      chatSession,
+      chatId
     )
 
     keyDiagnosisInfo = ongoingQueryInformation.key_diagnosis_info
@@ -178,7 +194,8 @@ export const handleUserInput = async (
     knowledgeData,
     diagnosesData,
     userInput,
-    chatSession
+    chatSession,
+    chatId
   )
 
   const response = modelResponse.response
@@ -187,7 +204,8 @@ export const handleUserInput = async (
 
 const handleFirstQuery = async (
   userInput: string,
-  chatSession: ChatSession
+  chatSession: ChatSession,
+  chatId: number
 ): Promise<{
   initialQueryInformation: {
     key_permanent_info: string[]
@@ -205,7 +223,8 @@ const handleFirstQuery = async (
 
   const initialQueryInformation = await parseInitialQuery(
     formattedNewChatPrompt,
-    chatSession
+    chatSession,
+    chatId
   )
 
   if (!initialQueryInformation) {
@@ -252,8 +271,12 @@ const lookupInformation = async (
   return { knowledgeData, diagnosesData }
 }
 
-const extractKeyInfo = async (userInput: string, chatSession: ChatSession) => {
-  const info = await extractInfoFromUserInput(userInput, chatSession)
+const extractKeyInfo = async (
+  userInput: string,
+  chatSession: ChatSession,
+  chatId: number
+) => {
+  const info = await extractInfoFromUserInput(userInput, chatSession, chatId)
 
   if (!info) {
     console.error('Failed to extract key information.')
