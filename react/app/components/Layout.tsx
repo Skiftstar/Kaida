@@ -1,20 +1,20 @@
-import { useState } from "react"
-import { Navbar } from "./Navbar/Navbar.js"
-import { Outlet, useNavigate } from "react-router"
-import { useUser } from "~/contexts/UserContext.js"
-import { PageContext } from "~/contexts/PageContext.js"
+import { useState } from 'react'
+import { Navbar } from './Navbar/Navbar.js'
+import { Outlet, useNavigate } from 'react-router'
+import { useUser } from '~/contexts/UserContext.js'
+import { PageContext } from '~/contexts/PageContext.js'
 
 export function SideLayout() {
   const [isDark, setIsDark] = useState(false)
   const [navbarOpen, setNavbarOpen] = useState(false)
-  const [currentScreen, setCurrentScreen] = useState("")
+  const [currentScreen, setCurrentScreen] = useState('')
 
   const { user } = useUser()
   const isLoggedIn = user !== undefined
 
   const nav = useNavigate()
 
-  const themeClass = isDark ? "theme-dark" : "theme-light"
+  const themeClass = isDark ? 'theme-dark' : 'theme-light'
 
   const toggleTheme = () => {
     setIsDark((prev) => !prev)
@@ -27,54 +27,54 @@ export function SideLayout() {
   return (
     <div
       className={`w-[100vw] h-[100vh] ${
-        isDark ? "!bg-[#ffffff]" : "!bg-[#000000]"
+        isDark ? '!bg-[#ffffff]' : '!bg-[#000000]'
       }`}
     >
       <div
         className={`${themeClass}`}
         style={{
           flex: 1,
-          position: "relative",
-          overflow: "hidden",
-          height: "100%",
-          aspectRatio: "9 / 19",
-          marginLeft: "auto",
-          marginRight: "auto",
-          borderRadius: "20px",
-          zIndex: 0,
+          position: 'relative',
+          overflow: 'hidden',
+          height: '100%',
+          aspectRatio: '9 / 19',
+          marginLeft: 'auto',
+          marginRight: 'auto',
+          borderRadius: '20px',
+          zIndex: 0
         }}
       >
         <div style={{ flex: 1 }}>
           {isLoggedIn && (
             <div
               style={{
-                height: "50px",
-                display: "flex",
-                justifyContent: "start",
-                alignItems: "center",
-                gap: "20px",
-                paddingLeft: "20px",
-                paddingBottom: "15px",
-                marginTop: "15px",
+                height: '50px',
+                display: 'flex',
+                justifyContent: 'start',
+                alignItems: 'center',
+                gap: '20px',
+                paddingLeft: '20px',
+                paddingBottom: '15px',
+                marginTop: '15px'
               }}
             >
               {!navbarOpen && (
                 <div>
                   <button
                     onClick={toggleNavbar}
-                    style={{ fontSize: "26px", fontWeight: "bold" }}
+                    style={{ fontSize: '26px', fontWeight: 'bold' }}
                   >
                     =
                   </button>
                 </div>
               )}
-              <span style={{ fontWeight: "bold", fontSize: "26px" }}>
+              <span style={{ fontWeight: 'bold', fontSize: '26px' }}>
                 {currentScreen}
               </span>
               <button
                 onClick={() => {
-                  nav("/profile")
-                  setCurrentScreen("Profile")
+                  nav('/profile')
+                  setCurrentScreen('Profile')
                 }}
                 className="ml-auto mr-5"
               >
@@ -87,7 +87,10 @@ export function SideLayout() {
             </div>
           )}
           <PageContext.Provider
-            value={{ currPage: currentScreen, setCurrPage: setCurrentScreen }}
+            value={{
+              currPage: currentScreen,
+              setCurrPage: setCurrentScreen
+            }}
           >
             <Outlet />
           </PageContext.Provider>

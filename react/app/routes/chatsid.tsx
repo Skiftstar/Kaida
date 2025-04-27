@@ -182,6 +182,35 @@ export default function ChatsDetail() {
         )}
       </div>
       <div className="mt-2 ml-2 w-full items-center justify-center flex">
+        <div
+          style={{
+            width: '40px',
+            height: '40px',
+            marginRight: '5px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#bfbfbf'
+          }}
+          className="rounded-full"
+        >
+          <button
+            className="font-bold text-xl"
+            style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              color: modelThinking ? '#bfbfbf' : '#007AFF'
+            }}
+            onClick={() => {
+              if (!inputValue || inputValue.length === 0) return
+              handleMessageSend(inputValue)
+              setInputValue('')
+            }}
+            disabled={modelThinking}
+          >
+            {'S'}
+          </button>
+        </div>
         <textarea
           className="textInput"
           style={{
@@ -190,7 +219,6 @@ export default function ChatsDetail() {
             borderRadius: '10px',
             paddingLeft: '10px',
             paddingTop: '5px',
-            marginRight: '10px',
             fontSize: '20px',
             resize: 'none'
           }}
@@ -203,8 +231,9 @@ export default function ChatsDetail() {
         />
         <div
           style={{
-            width: '10%',
+            width: '50px',
             height: '50px',
+            marginRight: '5px',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center'

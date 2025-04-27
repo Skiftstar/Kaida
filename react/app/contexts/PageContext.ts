@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react"
+import { createContext, useContext } from 'react'
 
 type PageContextType = {
   currPage: string
@@ -9,6 +9,6 @@ export const PageContext = createContext<PageContextType | undefined>(undefined)
 
 export const usePage = () => {
   const ctx = useContext(PageContext)
-  if (!ctx) throw new Error("usePage must be used within a UserProvider")
+  if (!ctx) throw new Error('usePage must be used within a UserProvider')
   return ctx
 }
