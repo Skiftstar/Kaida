@@ -1,5 +1,5 @@
 import type { Chat, ChatInfo, Message, User } from '~/types'
-import { get, post } from './Axios'
+import { del, get, post } from './Axios'
 
 export const login = async (
   username: string,
@@ -184,4 +184,20 @@ export const addToPromptHistory = async (
   if (response.status !== 201) return undefined
 
   return response.data.id
+}
+
+export const deleteChat = async (chatId: string) => {
+  const response = await del(`/chats/${chatId}`)
+
+  if (response.status !== 204) return false
+
+  return true
+}
+
+export const deleteDiagnosis = async (diagnosisId: string) => {
+  const response = await del(`/diagnosis/${diagnosisId}`)
+
+  if (response.status !== 204) return false
+
+  return true
 }

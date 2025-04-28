@@ -1,5 +1,5 @@
 from . import diagnosis_bp
-from db import get_db_connection
+from db import get_db_connection, execute_query
 from flask import request, jsonify
 from sentence_transformer import model
 from flask_login import login_required, current_user
@@ -80,3 +80,13 @@ def update_diagnosis():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@login_required
+@diagnosis_bp.route("<id>", methods=["DELETE"])
+def delete_diagnosis(id):
+    is_deleted = execute_query("DELETE FROM diagnoses WHERE id = %s", (id,))
+
+    if not is_deleted:
+        return jsonify({"error deleting diagnosis"}), 500
+
+    return jsonify({}), 204

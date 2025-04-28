@@ -9,6 +9,7 @@ import type { ChatInfo, Message } from '~/types'
 import { createChatSession, handleUserInput } from '~/gemini/gemini'
 import type { ChatSession } from '@google/generative-ai'
 import { usePage } from '~/contexts/PageContext'
+import { ChatSettingsPopup } from '~/components/Popups/ChatSettingsPopup'
 
 export default function ChatsDetail() {
   const { id } = useParams()
@@ -24,21 +25,27 @@ export default function ChatsDetail() {
   const [chatSession, setChatSession] = useState<ChatSession | undefined>(
     undefined
   )
+  const [settingsPopup, setSettingsPopup] = useState(false)
 
   useEffect(() => {
     fetchChatMsgs()
+    fetchChatCoreInfo()
     setChatSession(createChatSession())
   }, [])
 
-  const fetchChatMsgs = async () => {
-    const messages = await fetchAllChatMessages(Number(id))
+  const fetchChatCoreInfo = async () => {
     const chatInfo = await getCoreChatInfo(Number(id))
-
-    if (!messages || !chatInfo) return //TODO: handle error
-
-    setTextMsgs(messages)
+    if (!chatInfo) return //TODO: handle error
     setChatCoreInfo(chatInfo)
     setCurrPage(chatInfo.title)
+  }
+
+  const fetchChatMsgs = async () => {
+    const messages = await fetchAllChatMessages(Number(id))
+
+    if (!messages) return //TODO: handle error
+
+    setTextMsgs(messages)
   }
 
   useEffect(() => {
@@ -103,6 +110,13 @@ export default function ChatsDetail() {
         height: '100vh'
       }}
     >
+      <ChatSettingsPopup
+        onClose={() => {
+          setSettingsPopup(false)
+        }}
+        diagnosisId={chatCoreInfo?.diagnosis_id ?? -1}
+        open={settingsPopup}
+      />
       <div
         id="scroll"
         style={{
@@ -182,35 +196,22 @@ export default function ChatsDetail() {
         )}
       </div>
       <div className="mt-2 ml-2 w-full items-center justify-center flex">
-        <div
+        <button
+          className="font-bold text-xl rounded-full justify-center items-center mr-2 h-[40px] w-[40px] flex bg-[#bfbfbf]"
           style={{
-            width: '40px',
-            height: '40px',
-            marginRight: '5px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#bfbfbf'
+            fontWeight: 'bold',
+            backgroundColor: modelThinking
+              ? '#bfbfbf'
+              : 'var(--usermessage-background-color)',
+            color: 'var(--background-color)'
           }}
-          className="rounded-full"
+          onClick={() => {
+            setSettingsPopup(true)
+          }}
+          disabled={modelThinking}
         >
-          <button
-            className="font-bold text-xl"
-            style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: modelThinking ? '#bfbfbf' : '#007AFF'
-            }}
-            onClick={() => {
-              if (!inputValue || inputValue.length === 0) return
-              handleMessageSend(inputValue)
-              setInputValue('')
-            }}
-            disabled={modelThinking}
-          >
-            {'S'}
-          </button>
-        </div>
+          {'S'}
+        </button>
         <textarea
           className="textInput"
           style={{
@@ -229,33 +230,24 @@ export default function ChatsDetail() {
             setInputValue(e.currentTarget.value)
           }}
         />
-        <div
+        <button
+          className="font-bold text-xl rounded-full justify-center items-center ml-2 mr-4 h-[40px] w-[40px] flex bg-[#bfbfbf]"
           style={{
-            width: '50px',
-            height: '50px',
-            marginRight: '5px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center'
+            fontWeight: 'bold',
+            backgroundColor: modelThinking
+              ? '#bfbfbf'
+              : 'var(--usermessage-background-color)',
+            color: 'var(--background-color)'
           }}
+          onClick={() => {
+            if (!inputValue || inputValue.length === 0) return
+            handleMessageSend(inputValue)
+            setInputValue('')
+          }}
+          disabled={modelThinking}
         >
-          <button
-            className="font-bold text-xl"
-            style={{
-              fontSize: '20px',
-              fontWeight: 'bold',
-              color: modelThinking ? '#bfbfbf' : '#007AFF'
-            }}
-            onClick={() => {
-              if (!inputValue || inputValue.length === 0) return
-              handleMessageSend(inputValue)
-              setInputValue('')
-            }}
-            disabled={modelThinking}
-          >
-            {'>'}
-          </button>
-        </div>
+          {'>'}
+        </button>
       </div>
     </div>
   )

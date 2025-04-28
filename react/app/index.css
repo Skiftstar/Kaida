@@ -2,7 +2,8 @@
   --color-text: #000;
   --background-color: #fff;
   --textinput-background-color: #e8e8e8;
-  --usermessage-background-color: #e0f7fa;
+  /* --usermessage-background-color: #e0f7fa; */
+  --usermessage-background-color: #5ed8f5;
   --botmessage-background-color: #f1f8e9;
   --systemmessage-background-color: #f4f4f4;
 }

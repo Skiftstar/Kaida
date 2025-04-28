@@ -33,3 +33,16 @@ def execute_and_fetchall_query(query: str, params: tuple):
     except Exception as e:
         print(f"Error executing query {query}: {str(e)}")
         return None
+    
+def execute_query(query: str, params: tuple):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute(query, params)
+        conn.commit()
+        cur.close()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"Error executing query {query}: {str(e)}")
+        return False

@@ -1,6 +1,6 @@
 from . import chats_bp
 from flask_login import login_required, current_user
-from db import execute_and_fetchone_query, execute_and_fetchall_query
+from db import execute_and_fetchone_query, execute_and_fetchall_query, execute_query
 from flask import jsonify, request
 
 
@@ -56,23 +56,26 @@ def createNewChat():
 @login_required
 @chats_bp.route("<id>/get-messages", methods=["GET"])
 def get_all_messages_of_chat(id):
-   rows = execute_and_fetchall_query("SELECT id, message, sender FROM chat_messages WHERE chat_id=%s ORDER BY created_at ASC", (id))
+    print("called!")
+    rows = execute_and_fetchall_query("SELECT id, message, sender FROM chat_messages WHERE chat_id=%s ORDER BY created_at ASC", (id,))
 
-   if not rows:
+    if not rows:
        return jsonify("error fetching chat messages"), 500
    
-   messages = [{
+    print(rows)
+
+    messages = [{
        "id": row[0],
        "message": row[1],
        "sender": row[2],
-   } for row in rows]
+    } for row in rows]
 
-   return jsonify({"messages": messages}), 200
+    return jsonify({"messages": messages}), 200
 
 @login_required
 @chats_bp.route("<id>/core-info", methods=["GET"])
 def get_chat_core_info(id):
-   rows = execute_and_fetchall_query("SELECT chats.id, chats.diagnosis_id, diagnoses.title FROM chats JOIN diagnoses ON chats.diagnosis_id = diagnoses.id WHERE chats.id = %s", (id))
+   rows = execute_and_fetchall_query("SELECT chats.id, chats.diagnosis_id, diagnoses.title FROM chats JOIN diagnoses ON chats.diagnosis_id = diagnoses.id WHERE chats.id = %s", (id,))
    
    if not rows or not len(rows) > 0:
        return jsonify("error fetching chat core info"), 500
@@ -94,3 +97,13 @@ def insert_message_into_chat(id):
         return jsonify("error creating chatmessage"), 500
 
     return jsonify({"id": message_id}), 201
+
+@login_required
+@chats_bp.route("<id>", methods=["DELETE"])
+def delete_chat(id):
+    is_deleted = execute_query("DELETE FROM chats WHERE id = %s", (id,))
+
+    if not is_deleted:
+        return jsonify({"error deleting chat"}), 500
+
+    return jsonify({}), 204
