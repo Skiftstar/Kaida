@@ -15,6 +15,7 @@ export type Chat = {
 export type ChatInfo = {
   id: number
   title: string
+  summary: string
   diagnosis_id: number
 }
 

@@ -93,11 +93,6 @@ AFTER INSERT OR UPDATE ON diagnosis_embeddings
 FOR EACH ROW
 EXECUTE FUNCTION update_diagnosis_updated_at();
 
-CREATE TRIGGER trigger_update_on_summary_change
-BEFORE UPDATE OF summary ON diagnoses
-FOR EACH ROW
-EXECUTE FUNCTION update_diagnosis_updated_at();
-
 CREATE TRIGGER trigger_update_on_chat_message
 AFTER INSERT OR UPDATE ON chat_messages
 FOR EACH ROW

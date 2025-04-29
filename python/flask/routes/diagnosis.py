@@ -56,22 +56,25 @@ def insert_diagnosis():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-@diagnosis_bp.route("update", methods=["PUT"])
-def update_diagnosis():
-    """Update an existing diagnosis in the database"""
+@login_required
+@diagnosis_bp.route("<id>", methods=["PUT"])
+def update_diagnosis(id):
     data = request.json
-    diagnosis_id = data.get("id")
     summary = data.get("summary")
+    title = data.get("title")
+    # True when it was edited manually by the user
+    title_custom = data.get("title_custom")
+    summary_custom = data.get("summary_custom")
 
-    if not diagnosis_id or not summary:
-        return jsonify({"error": "Missing 'id' or 'summary' field"}), 400
+    if summary is None or title is None or title_custom is None or summary_custom is None:
+        return jsonify({"error": "Missing 'title', 'summary', 'title_custom' or 'summary_custom' field"}), 400
 
     try:
         conn = get_db_connection()
         cur = conn.cursor()
 
         embedding = model.encode(summary).tolist()
-        cur.execute("UPDATE diagnoses SET summary = %s, embedding = %s WHERE id = %s", (summary, embedding, diagnosis_id))
+        cur.execute("UPDATE diagnoses SET summary = %s, summary_embedding = %s, title = %s, title_custom = %s, summary_custom = %s, updated_at = NOW() WHERE id = %s", (summary, embedding, title, title_custom, summary_custom, id))
         conn.commit()
         cur.close()
         conn.close()

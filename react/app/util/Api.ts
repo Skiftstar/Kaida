@@ -1,5 +1,5 @@
 import type { Chat, ChatInfo, Message, User } from '~/types'
-import { del, get, post } from './Axios'
+import { del, get, post, put } from './Axios'
 
 export const login = async (
   username: string,
@@ -194,10 +194,29 @@ export const deleteChat = async (chatId: string) => {
   return true
 }
 
-export const deleteDiagnosis = async (diagnosisId: string) => {
+export const deleteDiagnosis = async (diagnosisId: number) => {
   const response = await del(`/diagnosis/${diagnosisId}`)
 
   if (response.status !== 204) return false
+
+  return true
+}
+
+export const updateDiagnosis = async (
+  diagnosisId: number,
+  title: string,
+  summary: string,
+  title_custom: boolean,
+  summary_custom: boolean
+) => {
+  const response = await put(`/diagnosis/${diagnosisId}`, {
+    title,
+    summary,
+    title_custom,
+    summary_custom
+  })
+
+  if (response.status !== 200) return false
 
   return true
 }

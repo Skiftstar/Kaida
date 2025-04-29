@@ -75,12 +75,12 @@ def get_all_messages_of_chat(id):
 @login_required
 @chats_bp.route("<id>/core-info", methods=["GET"])
 def get_chat_core_info(id):
-   rows = execute_and_fetchall_query("SELECT chats.id, chats.diagnosis_id, diagnoses.title FROM chats JOIN diagnoses ON chats.diagnosis_id = diagnoses.id WHERE chats.id = %s", (id,))
+   rows = execute_and_fetchall_query("SELECT chats.id, chats.diagnosis_id, diagnoses.title, diagnoses.summary FROM chats JOIN diagnoses ON chats.diagnosis_id = diagnoses.id WHERE chats.id = %s", (id,))
    
    if not rows or not len(rows) > 0:
        return jsonify("error fetching chat core info"), 500
 
-   chat_info = dict(id=rows[0][0], diagnosis_id=rows[0][1], title=rows[0][2])
+   chat_info = dict(id=rows[0][0], diagnosis_id=rows[0][1], title=rows[0][2], summary=rows[0][3])
 
    return jsonify(chat_info), 200
 

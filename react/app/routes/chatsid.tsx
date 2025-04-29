@@ -33,6 +33,17 @@ export default function ChatsDetail() {
     setChatSession(createChatSession())
   }, [])
 
+  useEffect(() => {
+    if (chatCoreInfo) setCurrPage(chatCoreInfo.title)
+  }, [chatCoreInfo])
+
+  useEffect(() => {
+    const div = document.getElementById('scroll')
+    if (div) {
+      div.scrollTop = div.scrollHeight
+    }
+  }, [textmsgs])
+
   const fetchChatCoreInfo = async () => {
     const chatInfo = await getCoreChatInfo(Number(id))
     if (!chatInfo) return //TODO: handle error
@@ -47,13 +58,6 @@ export default function ChatsDetail() {
 
     setTextMsgs(messages)
   }
-
-  useEffect(() => {
-    const div = document.getElementById('scroll')
-    if (div) {
-      div.scrollTop = div.scrollHeight
-    }
-  }, [textmsgs])
 
   const handleMessageSend = async (message: string) => {
     if (!chatSession || !chatCoreInfo) return
@@ -110,13 +114,16 @@ export default function ChatsDetail() {
         height: '100vh'
       }}
     >
-      <ChatSettingsPopup
-        onClose={() => {
-          setSettingsPopup(false)
-        }}
-        diagnosisId={chatCoreInfo?.diagnosis_id ?? -1}
-        open={settingsPopup}
-      />
+      {chatCoreInfo !== undefined && (
+        <ChatSettingsPopup
+          onClose={() => {
+            setSettingsPopup(false)
+          }}
+          setChatCoreInfo={setChatCoreInfo}
+          chatCoreInfo={chatCoreInfo!}
+          open={settingsPopup}
+        />
+      )}
       <div
         id="scroll"
         style={{
