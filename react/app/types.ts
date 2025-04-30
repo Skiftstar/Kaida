@@ -24,3 +24,25 @@ export type Message = {
   message: string
   sender: string
 }
+
+export type Prescription = {
+  id: number
+  dose: number
+  doseUnit: PrescriptionDoseUnit
+  interval: number
+  intervalUnit: PrescriptionIntervalUnit
+  medName: string
+  startDate: number
+  endDate: number
+}
+
+export enum PrescriptionDoseUnit {
+  MG = 'mg',
+  ML = 'ml'
+}
+
+export enum PrescriptionIntervalUnit {
+  DAYS = 'days',
+  HOURS = 'hours',
+  MINUTES = 'minutes'
+}

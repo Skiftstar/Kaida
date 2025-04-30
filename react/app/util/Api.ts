@@ -1,4 +1,4 @@
-import type { Chat, ChatInfo, Message, User } from '~/types'
+import type { Chat, ChatInfo, Message, Prescription, User } from '~/types'
 import { del, get, post, put } from './Axios'
 
 export const login = async (
@@ -219,4 +219,14 @@ export const updateDiagnosis = async (
   if (response.status !== 200) return false
 
   return true
+}
+
+export const getUserPrescriptions = async (): Promise<
+  Prescription[] | undefined
+> => {
+  const response = await get('/meds/get')
+
+  if (response.status !== 200) return undefined
+
+  return response.data.meds
 }

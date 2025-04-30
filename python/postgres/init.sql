@@ -68,6 +68,26 @@ CREATE TABLE chat_messages (
     created_at TIMESTAMP DEFAULT NOW()
 );
 
+CREATE TABLE sessions (
+	id SERIAL PRIMARY KEY,
+	diagnosis_id INT REFERENCES diagnoses(id) ON DELETE CASCADE,
+	user_id INT REFERENCES users(id) ON DELETE CASCADE,
+	time TIMESTAMP NOT NULL,
+	title TEXT NOT NULL
+);
+
+CREATE TABLE prescriptions (
+	id SERIAL PRIMARY KEY,
+	user_id INT REFERENCES users(id) ON DELETE CASCADE,
+	med_name TEXT NOT NULL,
+	start_date TIMESTAMP DEFAULT NOW(),
+	end_date TIMESTAMP NOT NULL,
+	dose INT NOT NULL,
+	dose_unit TEXT CHECK (dose_unit IN ('mg', 'ml')),
+	interval INT NOT NULL,
+  interval_unit TEXT CHECK (interval_unit IN ('minutes', 'hours', 'days'))
+);
+
 CREATE OR REPLACE FUNCTION update_diagnosis_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN

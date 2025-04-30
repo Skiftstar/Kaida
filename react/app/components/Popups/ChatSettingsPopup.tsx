@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router'
 import { Popup } from '../Popup'
 import { deleteDiagnosis, updateDiagnosis } from '~/util/Api'
 import type { ChatInfo } from '~/types'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 export function ChatSettingsPopup({
   open,
