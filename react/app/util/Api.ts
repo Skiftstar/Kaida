@@ -1,4 +1,12 @@
-import type { Chat, ChatInfo, Message, Prescription, User } from '~/types'
+import type {
+  Chat,
+  ChatInfo,
+  Message,
+  Prescription,
+  PrescriptionDoseUnit,
+  PrescriptionIntervalUnit,
+  User
+} from '~/types'
 import { del, get, post, put } from './Axios'
 
 export const login = async (
@@ -229,4 +237,28 @@ export const getUserPrescriptions = async (): Promise<
   if (response.status !== 200) return undefined
 
   return response.data.meds
+}
+
+export const createPrescription = async (
+  medName: String,
+  startDate: string,
+  endDate: string,
+  dose: number,
+  doseUnit: PrescriptionDoseUnit,
+  interval: number,
+  intervalUnit: PrescriptionIntervalUnit
+): Promise<number | undefined> => {
+  const response = await post('/meds/insert', {
+    medName,
+    startDate,
+    endDate,
+    dose,
+    doseUnit,
+    interval,
+    intervalUnit
+  })
+
+  if (response.status !== 201) return undefined
+
+  return response.data.id
 }

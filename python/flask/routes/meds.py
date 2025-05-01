@@ -1,4 +1,5 @@
 from . import meds_bp
+from util import require_fields
 from flask import request, jsonify
 from db import get_db_connection, execute_and_fetchone_query, execute_and_fetchall_query
 from flask_login import login_required, current_user
@@ -27,10 +28,10 @@ def get_user_meds():
 @login_required
 @meds_bp.route("insert", methods=["POST"])
 def insert_med():
-    data = request.json()
-    med_name, start_date, end_date, dose, dose_unit, interval, interval_unit = require_fields(data, "medName", "startDate", "endDate", "dose", "doseUnit", "interval", "interval_unit")
+    data = request.json
+    med_name, start_date, end_date, dose, dose_unit, interval, interval_unit = require_fields(data, "medName", "startDate", "endDate", "dose", "doseUnit", "interval", "intervalUnit")
 
-    id = execute_and_fetchone_query("INSERT INTO prescriptions (med_name, start_date, end_date, dose, dose_unit, interval, interval_unit) VALUES(%s, %s, %s, %s, %s, %s, %s)", (med_name, start_date, end_date, dose, dose_unit, interval, interval_unit))
+    id = execute_and_fetchone_query("INSERT INTO prescriptions (med_name, start_date, end_date, dose, dose_unit, interval, interval_unit, user_id) VALUES(%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id", (med_name, start_date, end_date, dose, dose_unit, interval, interval_unit, current_user.id))
 
     if id is None:
         return jsonify("Failed inserting prescription!"), 500

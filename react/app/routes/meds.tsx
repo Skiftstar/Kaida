@@ -34,8 +34,9 @@ export default function MedsRoute() {
     <div className="flex h-[calc(100vh-65px)] flex-col">
       {popupOpen && (
         <MedicationPopup
-          onClose={() => {
+          onClose={(refresh: boolean) => {
             setPopopOpen(false)
+            if (refresh) fetchPrescriptions()
           }}
           open={popupOpen}
           selectedPresc={selectedPresc}

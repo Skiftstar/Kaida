@@ -1,10 +1,12 @@
 import { Popup } from '../Popup'
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import {
   PrescriptionDoseUnit,
   PrescriptionIntervalUnit,
   type Prescription
 } from '~/types'
+import DatePicker from 'react-datepicker'
+import { createPrescription } from '~/util/Api'
 
 export function MedicationPopup({
   open,
@@ -12,7 +14,7 @@ export function MedicationPopup({
   selectedPresc
 }: {
   open: boolean
-  onClose: () => void
+  onClose: (refresh: boolean) => void
   selectedPresc: Prescription | undefined
 }) {
   const [medName, setMedName] = useState(selectedPresc?.medName ?? '')
@@ -24,98 +26,161 @@ export function MedicationPopup({
   const [intervalUnit, setIntervalUnit] = useState(
     selectedPresc?.intervalUnit ?? PrescriptionIntervalUnit.DAYS
   )
+  const [startDate, setStartDate] = useState<Date | null>(new Date())
+  const [endDate, setEndDate] = useState<Date | null>(new Date())
   const [actionPending, setActionPending] = useState(false)
 
   const handleMedicationDelete = async () => {}
 
-  const handleClose = async () => {
-    onClose()
+  const handleCreateNew = async (e: FormEvent) => {
+    e.preventDefault()
+    //TODO: Error handling
+    if (endDate!.getTime() < startDate!.getTime()) return
+
+    const id = await createPrescription(
+      medName,
+      startDate!.toISOString(),
+      endDate!.toISOString(),
+      dose,
+      doseUnit,
+      interval,
+      intervalUnit
+    )
+
+    if (!id) return //TODO: Error handling
+
+    handleClose(true)
+  }
+
+  const handleClose = async (refresh?: boolean) => {
+    onClose(refresh ?? false)
   }
 
   return (
     <Popup open={open} onClose={handleClose}>
       <div className="flex flex-col gap-6 mt-2 px-5">
-        <div className="w-full flex flex-col gap-2">
-          <span className="font-bold text-2xl">Medication</span>
-          <input
-            type="text"
-            className="textInput p-2 w-full rounded !text-xl"
-            placeholder="Medication..."
-            onChange={(e) => {
-              const value = e.currentTarget.value.trim()
-              setMedName(value)
-            }}
-            value={medName}
-          />
-        </div>
-
-        <div className="w-full flex flex-col gap-2">
-          <span className="font-bold text-2xl">Dose</span>
-          <div className="flex gap-2">
+        <form className="flex flex-col gap-6" onSubmit={handleCreateNew}>
+          <div className="w-full flex flex-col gap-2">
+            <span className="font-bold text-2xl">Medication</span>
             <input
-              className="resize-none w-full textInput rounded !text-xl p-2"
-              value={dose}
-              type="number"
-              placeholder="Amount..."
+              type="text"
+              className="textInput p-2 w-full rounded !text-xl"
+              placeholder="Medication..."
+              required={true}
               onChange={(e) => {
-                const value = Number(e.currentTarget.value)
-                setDose(value)
+                const value = e.currentTarget.value.trim()
+                setMedName(value)
               }}
+              value={medName}
             />
-            <select
-              className="textInput p-2 rounded"
-              value={doseUnit}
-              onChange={(e) => {
-                setDoseUnit(e.target.value as PrescriptionDoseUnit)
-              }}
-            >
-              {Object.entries(PrescriptionDoseUnit).map(([key, val]) => (
-                <option key={key} value={val}>
-                  {val}
-                </option>
-              ))}
-            </select>
           </div>
-        </div>
 
-        <div className="w-full flex flex-col gap-2">
-          <span className="font-bold text-2xl">Every</span>
-          <div className="flex gap-2">
-            <input
-              className="resize-none w-full textInput rounded !text-xl p-2"
-              value={interval}
-              type="number"
-              placeholder="Amount..."
-              onChange={(e) => {
-                const value = Number(e.currentTarget.value)
-                setInterval(value)
-              }}
-            />
-            <select
-              className="textInput p-2 rounded"
-              value={intervalUnit}
-              onChange={(e) => {
-                setIntervalUnit(e.target.value as PrescriptionIntervalUnit)
-              }}
-            >
-              {Object.entries(PrescriptionIntervalUnit).map(([key, val]) => (
-                <option key={key} value={val}>
-                  {val}
-                </option>
-              ))}
-            </select>
+          <div className="w-full flex flex-col gap-2">
+            <span className="font-bold text-2xl">Dose</span>
+            <div className="flex gap-2">
+              <input
+                className="resize-none w-full textInput rounded !text-xl p-2"
+                value={dose}
+                type="number"
+                required={true}
+                placeholder="Amount..."
+                onChange={(e) => {
+                  const value = Number(e.currentTarget.value)
+                  setDose(value < 0 ? 0 : value)
+                }}
+              />
+              <select
+                className="textInput p-2 rounded"
+                value={doseUnit}
+                onChange={(e) => {
+                  setDoseUnit(e.target.value as PrescriptionDoseUnit)
+                }}
+              >
+                {Object.entries(PrescriptionDoseUnit).map(([key, val]) => (
+                  <option key={key} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col gap-2">
-          <span className="font-bold text-2xl">Danger Zone</span>
-          <button
-            onClick={handleMedicationDelete}
-            disabled={actionPending}
-            className="bg-red-500 font-bold rounded p-2"
-          >
-            Delete
-          </button>
-        </div>
+
+          <div className="w-full flex flex-col gap-2">
+            <span className="font-bold text-2xl">Every</span>
+            <div className="flex gap-2">
+              <input
+                className="resize-none w-full textInput rounded !text-xl p-2"
+                value={interval}
+                type="number"
+                required={true}
+                placeholder="Amount..."
+                onChange={(e) => {
+                  const value = Number(e.currentTarget.value)
+                  setInterval(value < 0 ? 0 : value)
+                }}
+              />
+              <select
+                className="textInput p-2 rounded"
+                value={intervalUnit}
+                onChange={(e) => {
+                  setIntervalUnit(e.target.value as PrescriptionIntervalUnit)
+                }}
+              >
+                {Object.entries(PrescriptionIntervalUnit).map(([key, val]) => (
+                  <option key={key} value={val}>
+                    {val}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="w-full flex flex-col gap-2">
+            <span className="font-bold text-2xl">Start Date</span>
+            <div className="flex gap-2 w-full">
+              <DatePicker
+                className="w-full textInput !text-2xl p-2"
+                selected={startDate}
+                required={true}
+                onChange={(date) => setStartDate(date)}
+              />
+            </div>
+          </div>
+
+          <div className="w-full flex flex-col gap-2">
+            <span className="font-bold text-2xl">End Date</span>
+            <div className="flex gap-2 w-full">
+              <DatePicker
+                className="w-full textInput !text-2xl p-2"
+                selected={endDate}
+                required={true}
+                onChange={(date) => setEndDate(date)}
+              />
+            </div>
+          </div>
+
+          {selectedPresc ? (
+            <div className="flex flex-col gap-2">
+              <span className="font-bold text-2xl">Danger Zone</span>
+              <button
+                onClick={handleMedicationDelete}
+                disabled={actionPending}
+                className="bg-red-500 font-bold rounded p-2"
+              >
+                Delete
+              </button>
+            </div>
+          ) : (
+            <div className="w-full">
+              <button
+                type="submit"
+                className="w-full bg-green-500 font-bold h-12 text-white pointer-events-auto"
+              >
+                Create
+              </button>
+            </div>
+          )}
+        </form>
       </div>
     </Popup>
   )
