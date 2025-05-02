@@ -262,3 +262,36 @@ export const createPrescription = async (
 
   return response.data.id
 }
+
+export const updatePrescription = async (
+  id: number,
+  medName: String,
+  startDate: string,
+  endDate: string,
+  dose: number,
+  doseUnit: PrescriptionDoseUnit,
+  interval: number,
+  intervalUnit: PrescriptionIntervalUnit
+): Promise<boolean> => {
+  const response = await put(`/meds/${id}`, {
+    medName,
+    startDate,
+    endDate,
+    dose,
+    doseUnit,
+    interval,
+    intervalUnit
+  })
+
+  if (response.status !== 200) return false
+
+  return true
+}
+
+export const deletePrescription = async (prescId: number) => {
+  const response = await del(`/meds/${prescId}`)
+
+  if (response.status !== 204) return false
+
+  return true
+}

@@ -6,7 +6,11 @@ import {
   type Prescription
 } from '~/types'
 import DatePicker from 'react-datepicker'
-import { createPrescription } from '~/util/Api'
+import {
+  createPrescription,
+  deletePrescription,
+  updatePrescription
+} from '~/util/Api'
 
 export function MedicationPopup({
   open,
@@ -18,24 +22,39 @@ export function MedicationPopup({
   selectedPresc: Prescription | undefined
 }) {
   const [medName, setMedName] = useState(selectedPresc?.medName ?? '')
-  const [dose, setDose] = useState(selectedPresc?.dose ?? 0)
+  const [dose, setDose] = useState(selectedPresc?.dose ?? 1)
   const [doseUnit, setDoseUnit] = useState(
     selectedPresc?.doseUnit ?? PrescriptionDoseUnit.MG
   )
-  const [interval, setInterval] = useState(selectedPresc?.interval ?? 0)
+  const [interval, setInterval] = useState(selectedPresc?.interval ?? 1)
   const [intervalUnit, setIntervalUnit] = useState(
     selectedPresc?.intervalUnit ?? PrescriptionIntervalUnit.DAYS
   )
-  const [startDate, setStartDate] = useState<Date | null>(new Date())
-  const [endDate, setEndDate] = useState<Date | null>(new Date())
+  const [startDate, setStartDate] = useState<Date | null>(
+    new Date(selectedPresc?.startDate ?? Date.now())
+  )
+  const [endDate, setEndDate] = useState<Date | null>(
+    new Date(selectedPresc?.endDate ?? Date.now())
+  )
   const [actionPending, setActionPending] = useState(false)
 
-  const handleMedicationDelete = async () => {}
+  const handleMedicationDelete = async () => {
+    if (!selectedPresc) return
+
+    setActionPending(true)
+    const isDeleted = await deletePrescription(selectedPresc.id)
+    if (!isDeleted) return //TODO: Error handling
+
+    selectedPresc = undefined
+    handleClose(true)
+  }
 
   const handleCreateNew = async (e: FormEvent) => {
     e.preventDefault()
     //TODO: Error handling
     if (endDate!.getTime() < startDate!.getTime()) return
+
+    setActionPending(true)
 
     const id = await createPrescription(
       medName,
@@ -49,10 +68,30 @@ export function MedicationPopup({
 
     if (!id) return //TODO: Error handling
 
+    setActionPending(false)
     handleClose(true)
   }
 
   const handleClose = async (refresh?: boolean) => {
+    if (selectedPresc) {
+      if (endDate!.getTime() < startDate!.getTime()) return
+
+      refresh = true
+      setActionPending(true)
+      const isUpdated = await updatePrescription(
+        selectedPresc.id,
+        medName,
+        startDate!.toISOString(),
+        endDate!.toISOString(),
+        dose,
+        doseUnit,
+        interval,
+        intervalUnit
+      )
+      if (!isUpdated) return //TODO: Error handling
+      setActionPending(false)
+    }
+
     onClose(refresh ?? false)
   }
 
@@ -164,6 +203,9 @@ export function MedicationPopup({
               <span className="font-bold text-2xl">Danger Zone</span>
               <button
                 onClick={handleMedicationDelete}
+                style={{
+                  backgroundColor: actionPending ? '#bfbfbf !important' : ''
+                }}
                 disabled={actionPending}
                 className="bg-red-500 font-bold rounded p-2"
               >
@@ -174,6 +216,10 @@ export function MedicationPopup({
             <div className="w-full">
               <button
                 type="submit"
+                disabled={actionPending}
+                style={{
+                  backgroundColor: actionPending ? '#bfbfbf !important' : ''
+                }}
                 className="w-full bg-green-500 font-bold h-12 text-white pointer-events-auto"
               >
                 Create

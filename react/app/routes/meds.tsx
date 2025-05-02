@@ -36,6 +36,7 @@ export default function MedsRoute() {
         <MedicationPopup
           onClose={(refresh: boolean) => {
             setPopopOpen(false)
+            setSelectedPresc(undefined)
             if (refresh) fetchPrescriptions()
           }}
           open={popupOpen}
@@ -43,7 +44,77 @@ export default function MedsRoute() {
         />
       )}
 
-      <div className="flex flex-col gap-6 m-4"></div>
+      <div className="flex flex-col m-4">
+        {prescriptions.map((presc) => {
+          // const date = formatDate(new Date(chat.timestamp))
+          // const date = "";
+          const startDate = new Date(presc.startDate)
+          const endDate = new Date(presc.endDate)
+          return (
+            <button
+              style={{ width: '100%' }}
+              key={presc.id}
+              onClick={() => {
+                setSelectedPresc(presc)
+                setPopopOpen(true)
+              }}
+            >
+              <div
+                style={{
+                  border: '1px solid #ccc',
+                  borderRadius: '5px',
+                  padding: '10px',
+                  margin: '10px'
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: 'bold',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}
+                  >
+                    {presc.medName}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span
+                    style={{
+                      display: 'block',
+                      color: '#888',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      textAlign: 'start'
+                    }}
+                  >
+                    {presc.dose}
+                    {presc.doseUnit} every {presc.interval} {presc.intervalUnit}
+                  </span>
+                  <span
+                    style={{
+                      color: '#888',
+                      marginLeft: '10px',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {startDate.toLocaleDateString()} -{' '}
+                    {endDate.toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+            </button>
+          )
+        })}
+      </div>
 
       <div className="w-full mt-auto">
         <button
