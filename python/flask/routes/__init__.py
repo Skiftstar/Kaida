@@ -15,3 +15,4 @@ from .diagnosis_emb import *
 from .chats import * 
 from .prompt_history import *
 from .meds import *
+from .sessions import *

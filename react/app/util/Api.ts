@@ -5,6 +5,7 @@ import type {
   Prescription,
   PrescriptionDoseUnit,
   PrescriptionIntervalUnit,
+  Session,
   User
 } from '~/types'
 import { del, get, post, put } from './Axios'
@@ -290,6 +291,59 @@ export const updatePrescription = async (
 
 export const deletePrescription = async (prescId: number) => {
   const response = await del(`/meds/${prescId}`)
+
+  if (response.status !== 204) return false
+
+  return true
+}
+
+export const getUserSessions = async (): Promise<Session[] | undefined> => {
+  const response = await get('/sessions/get')
+
+  if (response.status !== 200) return undefined
+
+  return response.data.sessions
+}
+
+export const createSession = async (
+  title: String,
+  time: string,
+  reason: string,
+  diagnosisId: number | undefined
+): Promise<number | undefined> => {
+  const response = await post('/sessions/insert', {
+    title,
+    time,
+    reason,
+    diagnosisId
+  })
+
+  if (response.status !== 201) return undefined
+
+  return response.data.id
+}
+
+export const updateSession = async (
+  id: number,
+  title: String,
+  time: string,
+  reason: string,
+  diagnosisId: number | undefined
+): Promise<boolean> => {
+  const response = await put(`/sessions/${id}`, {
+    title,
+    time,
+    reason,
+    diagnosisId
+  })
+
+  if (response.status !== 200) return false
+
+  return true
+}
+
+export const deleteSession = async (sessionId: number) => {
+  const response = await del(`/sessions/${sessionId}`)
 
   if (response.status !== 204) return false
 

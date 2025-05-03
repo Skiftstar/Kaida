@@ -46,3 +46,11 @@ export enum PrescriptionIntervalUnit {
   HOURS = 'hours',
   MINUTES = 'minutes'
 }
+
+export type Session = {
+  id: number
+  time: number
+  diagnosisId: number
+  title: string
+  reason: string
+}

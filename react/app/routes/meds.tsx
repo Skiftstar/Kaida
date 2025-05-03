@@ -46,8 +46,6 @@ export default function MedsRoute() {
 
       <div className="flex flex-col m-4">
         {prescriptions.map((presc) => {
-          // const date = formatDate(new Date(chat.timestamp))
-          // const date = "";
           const startDate = new Date(presc.startDate)
           const endDate = new Date(presc.endDate)
           return (

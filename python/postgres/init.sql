@@ -73,7 +73,8 @@ CREATE TABLE sessions (
 	diagnosis_id INT REFERENCES diagnoses(id) ON DELETE CASCADE,
 	user_id INT REFERENCES users(id) ON DELETE CASCADE,
 	time TIMESTAMP NOT NULL,
-	title TEXT NOT NULL
+	title TEXT NOT NULL,
+	reason TEXT NOT NULL
 );
 
 CREATE TABLE prescriptions (
