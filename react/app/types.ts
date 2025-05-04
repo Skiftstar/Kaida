@@ -54,3 +54,11 @@ export type Session = {
   title: string
   reason: string
 }
+
+export type Diagnosis = {
+  id: number
+  title: string
+  summary: string
+  created_at: number
+  updated_at: number
+}

@@ -26,7 +26,8 @@ def get_user_sessions():
 @sessions_bp.route("insert", methods=["POST"])
 def insert_session():
     data = request.json
-    title, reason, diagnosis_id, time = require_fields(data, "title", "reason", "diagnosisId", "time")
+    title, reason, time = require_fields(data, "title", "reason", "time")
+    diagnosis_id = data.get("diagnosisId")
 
     id = execute_and_fetchone_query("INSERT INTO sessions (title, reason, time, diagnosis_id, user_id) VALUES(%s, %s, %s, %s, %s) RETURNING id", (title, reason, time, diagnosis_id, current_user.id))
 
@@ -39,7 +40,8 @@ def insert_session():
 @sessions_bp.route("<id>", methods=["PUT"])
 def update_session(id):
     data = request.json
-    title, reason, diagnosis_id, time = require_fields(data, "title", "reason", "diagnosisId", "time")
+    title, reason, time = require_fields(data, "title", "reason", "time")
+    diagnosis_id = data.get("diagnosisId")
 
     updated = execute_query("UPDATE sessions SET title = %s, reason = %s, time = %s, diagnosis_id = %s WHERE id = %s", (title, reason, time, diagnosis_id, id))
 

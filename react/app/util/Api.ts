@@ -1,6 +1,7 @@
 import type {
   Chat,
   ChatInfo,
+  Diagnosis,
   Message,
   Prescription,
   PrescriptionDoseUnit,
@@ -133,7 +134,9 @@ export const insertNewChatMessage = async (
   return response.data.id
 }
 
-export const getRecentDiagnoses = async (amount: number = 5) => {
+export const getRecentDiagnoses = async (
+  amount: number = 5
+): Promise<Diagnosis[] | undefined> => {
   const response = await get(`/diagnosis/recent-diagnoses?count=${amount}`)
 
   if (response.status !== 200) return undefined

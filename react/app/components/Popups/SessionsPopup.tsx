@@ -1,6 +1,6 @@
 import { Popup } from '../Popup'
 import { useState, type FormEvent } from 'react'
-import { type Session } from '~/types'
+import { type Diagnosis, type Session } from '~/types'
 import DatePicker from 'react-datepicker'
 import { createSession, deleteSession, updateSession } from '~/util/Api'
 
@@ -8,16 +8,18 @@ import { createSession, deleteSession, updateSession } from '~/util/Api'
 export function SessionsPopup({
   open,
   onClose,
+  availableDiagnoses,
   selectedSession
 }: {
   open: boolean
   onClose: (refresh: boolean) => void
+  availableDiagnoses: Diagnosis[]
   selectedSession: Session | undefined
 }) {
   const [title, setTitle] = useState(selectedSession?.title ?? '')
   const [reason, setReason] = useState(selectedSession?.reason ?? '')
-  const [diagnosisId, setDiagnosisId] = useState(
-    selectedSession?.diagnosisId ?? 0
+  const [diagnosisId, setDiagnosisId] = useState<number | undefined>(
+    selectedSession?.diagnosisId ?? undefined
   )
   const [time, setTime] = useState<Date | null>(
     new Date(selectedSession?.time ?? Date.now())
@@ -109,17 +111,24 @@ export function SessionsPopup({
           <div className="w-full flex flex-col gap-2">
             <span className="font-bold text-2xl">Linked Diagnosis</span>
             <div className="flex gap-2">
-              <input
-                className="resize-none w-full textInput rounded !text-xl p-2"
+              <select
+                className="textInput p-2 rounded w-full text-xl"
                 value={diagnosisId}
-                type="number"
-                required={true}
-                placeholder="Diagnosis ID..."
                 onChange={(e) => {
-                  const value = Number(e.currentTarget.value)
-                  setDiagnosisId(value < 0 ? 0 : value)
+                  setDiagnosisId(
+                    isNaN(e.target.value) ? undefined : Number(e.target.value)
+                  )
                 }}
-              />
+              >
+                <option key={'diagnId-None'} value={undefined}>
+                  {'-'}
+                </option>
+                {availableDiagnoses.map((diagn) => (
+                  <option key={diagn.id} value={diagn.id}>
+                    {diagn.id} - {diagn.title}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import { SessionsPopup } from '~/components/Popups/SessionsPopup'
 import { usePage } from '~/contexts/PageContext'
-import type { Session } from '~/types'
-import { getUserSessions } from '~/util/Api'
+import type { Diagnosis, Session } from '~/types'
+import { getRecentDiagnoses, getUserSessions } from '~/util/Api'
 
 export default function SessionsRoute() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [selectedSession, setSelectedSession] = useState<Session | undefined>(
     undefined
   )
+  const [userDiagnoses, setUserDiagnoses] = useState<Diagnosis[]>([])
   const [popupOpen, setPopopOpen] = useState(false)
 
   useEffect(() => {
+    fetchAllDiagnoses()
     fetchSessions()
   }, [])
 
@@ -24,6 +26,16 @@ export default function SessionsRoute() {
     if (!sessions) return //TODO: Error handling
 
     setSessions(sessions)
+  }
+
+  const fetchAllDiagnoses = async () => {
+    const diagnoses = await getRecentDiagnoses(-1) //-1 to fetch all
+
+    if (!diagnoses) return //TODO: Error Handling
+
+    diagnoses.sort((a, b) => a.id - b.id)
+
+    setUserDiagnoses(diagnoses)
   }
 
   const handleCreateNew = () => {
@@ -40,6 +52,7 @@ export default function SessionsRoute() {
             if (refresh) fetchSessions()
           }}
           open={popupOpen}
+          availableDiagnoses={userDiagnoses}
           selectedSession={selectedSession}
         />
       )}

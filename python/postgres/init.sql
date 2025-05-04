@@ -70,7 +70,7 @@ CREATE TABLE chat_messages (
 
 CREATE TABLE sessions (
 	id SERIAL PRIMARY KEY,
-	diagnosis_id INT REFERENCES diagnoses(id) ON DELETE CASCADE,
+	diagnosis_id INT REFERENCES diagnoses(id) ON DELETE SET NULL,
 	user_id INT REFERENCES users(id) ON DELETE CASCADE,
 	time TIMESTAMP NOT NULL,
 	title TEXT NOT NULL,
