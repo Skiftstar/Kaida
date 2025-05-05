@@ -39,6 +39,7 @@ export const KNOWLEDGE_DATABASE_RESPONSE = `
     ${MODEL_BOILERPLATE}
     Based on your last response, we have checked our database and will provide you with the information we found.
     If we didn't find anything about it in our database, the information will be empty.
+		We will also provide you with the medical plan of the past 3 months of the user or an empty array if there are none, as well as the current date as a reference point.
     Additionally we will give you the user query again, so you can better understand the context.
     Please provide the user with a fitting response, based on the information we provided you with.
     In your response, you can also ask the user for additional information, if you think it would be useful.
@@ -50,6 +51,8 @@ export const KNOWLEDGE_DATABASE_RESPONSE = `
 
     Information about diagnoses you requested: {{diagnoses}}
     Information from our knowledge database you requested: {{knowledge_database}}
+		Medical Plans: {{medical_plans}}
+		Current Date: {{current_date}}
     User Query: {{user_query}}
 
     Respond with only the JSON object.
@@ -67,10 +70,11 @@ export const FOLLOW_UP_PROMPT = `
       "key_permanent_info: [List of key points summarizing important permanent information (such as permanent medication, chronic illnesses, eating habits, etc.) or empty list if no useful data]"
       "key_diagnosis_info": ["List of key points summarizing important information you learn for the current diagnosis only, or empty list if no useful data"],
       "required_context": ["List of key points summarizing important information you think would be useful to search for more information."],
-      "diagnosis_ids": ["List of ids of the diagnosis you think are relevant to the query and want additional information about and have NOT received information about yet"]
+      "diagnosis_ids": ["List of ids of the diagnosis you think are relevant to the query and want additional information about and have NOT received information about yet"],
     }
 
     User response: {{user_response}}
 
     Respond with only the JSON object.
 `
+

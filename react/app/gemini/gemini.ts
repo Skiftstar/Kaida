@@ -7,13 +7,16 @@ import {
 import {
   addToPromptHistory,
   getRecentDiagnoses,
+  getUserPrescriptions,
   searchEmbeddings,
   storeKeyDiagnosisInfo,
   storeKeyPermanentInfo
 } from '~/util/Api'
+import type { Diagnosis, Prescription } from '~/types'
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
 const DIAGNOSES_COUNT = import.meta.env.VITE_RECENT_DIAGNOSES_COUNT
+const MEDICAL_PLAN_LIMIT = import.meta.env.VITE_MEDICAL_PLAN_LIMIT // How old (in days) medical plans can be to still be considered relevant
 
 if (!GEMINI_API_KEY) {
   throw new Error('Missing VITE_GEMINI_API_KEY in .env file')
@@ -108,6 +111,7 @@ export async function extractInfoFromUserInput(
 //TODO: change diagnosesData type
 export async function generateUserResponse(
   requestedKnowledgeData: { [term: string]: string },
+  medicalPlans: Prescription[],
   diagnosesData: any,
   userQuery: string,
   chatSession: ChatSession,
@@ -119,6 +123,8 @@ export async function generateUserResponse(
   )
     .replace('{{knowledge_database}}', JSON.stringify(requestedKnowledgeData))
     .replace('{{user_query}}', userQuery)
+    .replace('{{current_date}}', new Date(Date.now()).toLocaleDateString())
+    .replace('{{medical_plans}}', JSON.stringify(medicalPlans))
 
   const result = await chatSession.sendMessage(prompt_template)
   const responseText = cleanResponse(result.response.text())
@@ -136,7 +142,7 @@ export async function generateUserResponse(
 export async function formatNewChatPrompt(
   input: string,
   query_count: number,
-  recentDiagnoses: any[]
+  recentDiagnoses: Diagnosis[]
 ): Promise<string> {
   return NEW_CHAT_PROMPT.replace('{{user_prompt}}', input)
     .replace('{{count}}', query_count.toString())
@@ -190,8 +196,11 @@ export const handleUserInput = async (
     requiredContext
   )
 
+  const medicalPlans = (await getUserPrescriptions(MEDICAL_PLAN_LIMIT)) ?? []
+
   const modelResponse = await generateUserResponse(
     knowledgeData,
+    medicalPlans,
     diagnosesData,
     userInput,
     chatSession,
@@ -214,7 +223,7 @@ const handleFirstQuery = async (
     diagnosis_ids: string[]
   }
 }> => {
-  const recentDiagnoses = await getRecentDiagnoses(DIAGNOSES_COUNT)
+  const recentDiagnoses = (await getRecentDiagnoses(DIAGNOSES_COUNT)) ?? []
   const formattedNewChatPrompt = await formatNewChatPrompt(
     userInput,
     DIAGNOSES_COUNT,

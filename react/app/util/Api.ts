@@ -233,10 +233,12 @@ export const updateDiagnosis = async (
   return true
 }
 
-export const getUserPrescriptions = async (): Promise<
-  Prescription[] | undefined
-> => {
-  const response = await get('/meds/get')
+export const getUserPrescriptions = async (
+  ageLimit?: number
+): Promise<Prescription[] | undefined> => {
+  const response = await get(
+    `/meds/get${ageLimit ? `?ageLimit=${ageLimit}` : ''}`
+  )
 
   if (response.status !== 200) return undefined
 

@@ -7,7 +7,16 @@ from flask_login import login_required, current_user
 @login_required
 @meds_bp.route("get", methods=["GET"])
 def get_user_meds():
-    rows = execute_and_fetchall_query("SELECT id, med_name, start_date, end_date, dose, dose_unit, interval, interval_unit FROM prescriptions WHERE user_id = %s ORDER BY end_date DESC", (current_user.id,))
+    data = request.args
+    count = data.get("count", type=int) if data.get("count") else None
+
+    query = "SELECT id, med_name, start_date, end_date, dose, dose_unit, interval, interval_unit FROM prescriptions WHERE user_id = %s"
+
+    if count is not None:
+        query = f"{query} AND end_date >= CURRENT_DATE - INTERVAL '{count} days'"
+    query = f"{query} ORDER BY end_date DESC"
+
+    rows = execute_and_fetchall_query(query, (current_user.id,))
 
     if rows is None:
         return jsonify("Failed fetching user meds"), 500
