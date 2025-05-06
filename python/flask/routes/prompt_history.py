@@ -20,7 +20,7 @@ def insert_prompt_history(chat_id):
 @login_required
 @prompt_history_bp.route("/get-history", methods=["GET"])
 def get_chat_prompt_history(chat_id):
-    rows = execute_and_fetchall_query("SELECT id, sender, prompt, created_at FROM prompt_history WHERE chat_id = %s ODER BY created_at DESC")
+    rows = execute_and_fetchall_query("SELECT id, sender, prompt, created_at FROM prompt_history WHERE chat_id = %s ORDER BY created_at ASC", (chat_id,))
 
     if not rows:
         return jsonify("error fetching prompt_history"), 500

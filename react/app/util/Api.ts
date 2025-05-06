@@ -6,6 +6,7 @@ import type {
   Prescription,
   PrescriptionDoseUnit,
   PrescriptionIntervalUnit,
+  PromptHistoryMessage,
   Session,
   User
 } from '~/types'
@@ -353,4 +354,14 @@ export const deleteSession = async (sessionId: number) => {
   if (response.status !== 204) return false
 
   return true
+}
+
+export const fetchPromptHistory = async (
+  chatId: number
+): Promise<PromptHistoryMessage[] | undefined> => {
+  const response = await get(`/chats/${chatId}/prompt-history/get-history`)
+
+  if (response.status !== 200) return undefined
+
+  return response.data.history
 }

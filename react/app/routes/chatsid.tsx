@@ -164,7 +164,7 @@ export default function ChatsDetail() {
                   padding: '10px',
                   whiteSpace: 'pre-wrap',
                   maxWidth: '85%',
-                  wordWrap: 'break-word' // or use overflowWrap
+                  wordWrap: 'break-word'
                 }}
               >
                 <span className="max-w-full break-words">{msg.message}</span>

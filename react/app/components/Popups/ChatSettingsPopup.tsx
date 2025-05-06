@@ -3,6 +3,7 @@ import { Popup } from '../Popup'
 import { deleteDiagnosis, updateDiagnosis } from '~/util/Api'
 import type { ChatInfo } from '~/types'
 import { useState } from 'react'
+import { PromptHistoryDisplay } from '../PromptHistoryDisplay'
 
 export function ChatSettingsPopup({
   open,
@@ -101,6 +102,9 @@ export function ChatSettingsPopup({
           >
             {showPromptHistory ? 'Hide' : 'Show'} Prompt History
           </button>
+          {showPromptHistory && (
+            <PromptHistoryDisplay chatId={chatCoreInfo.id} />
+          )}
           <button
             onClick={() => {
               setShowEmbeddings(!showEmbeddings)

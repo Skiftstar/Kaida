@@ -5,6 +5,12 @@ export type User = {
   push_notifications_enabled: boolean
 }
 
+export type PromptHistoryMessage = {
+  sender: 'System' | 'Bot'
+  prompt: string
+  created_at: number
+}
+
 export type Chat = {
   id: number
   title: string
