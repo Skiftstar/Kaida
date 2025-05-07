@@ -4,6 +4,9 @@ import { fetchPromptHistory } from '~/util/Api'
 
 export function PromptHistoryDisplay({ chatId }: { chatId: number }) {
   const [messages, setMessages] = useState<PromptHistoryMessage[]>([])
+  const [extendedElement, setExtendedElement] = useState<number | undefined>(
+    undefined
+  )
 
   useEffect(() => {
     handleFetchPromptHistory()
@@ -22,19 +25,27 @@ export function PromptHistoryDisplay({ chatId }: { chatId: number }) {
       {messages.map((message) => {
         return (
           <div
-            style={{
-              borderRadius: '10px',
-              padding: '10px',
-              whiteSpace: 'pre-wrap',
-              wordWrap: 'break-word'
-            }}
-            className={
-              message.sender === 'Bot' ? 'botMessage' : 'systemMessage'
-            }
+            className={` rounded p-4 wrap-break-word whitespace-pre-wrap
+              ${message.sender === 'Bot' ? 'botMessage' : 'systemMessage'}
+            `}
           >
-            <span>{message.sender}:</span>
+            <span
+              onClick={() => {
+                setExtendedElement(
+                  extendedElement === message.id ? undefined : message.id
+                )
+              }}
+              className="cursor-pointer select-none"
+            >
+              {message.sender}:
+            </span>
             <br />
-            <span className="w-full">{message.prompt}</span>
+            <span
+              className="w-full inline-block overflow-hidden"
+              style={extendedElement === message.id ? {} : { height: '100px' }}
+            >
+              {message.prompt}
+            </span>
           </div>
         )
       })}

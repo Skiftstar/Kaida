@@ -80,7 +80,7 @@ export default function ChatsDetail() {
     const isFirstQuery =
       textmsgs.filter((msg) => msg.sender === 'Bot').length === 0
 
-    const response = await handleUserInput(
+    const { response, actionsExecuted } = await handleUserInput(
       chatSession,
       Number(id),
       message,
@@ -104,6 +104,8 @@ export default function ChatsDetail() {
         sender: 'Bot'
       }
     ])
+
+    if (actionsExecuted) fetchChatCoreInfo()
 
     setModelThinking(false)
   }

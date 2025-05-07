@@ -12,7 +12,8 @@ import {
   storeKeyDiagnosisInfo,
   storeKeyPermanentInfo
 } from '~/util/Api'
-import type { Diagnosis, Prescription } from '~/types'
+import type { Action, Diagnosis, Prescription } from '~/types'
+import { handleActions } from './actions'
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
 const DIAGNOSES_COUNT = import.meta.env.VITE_RECENT_DIAGNOSES_COUNT
@@ -30,7 +31,9 @@ const cleanResponse = (responseText: string): string => {
 
 export const createChatSession = (): ChatSession => {
   const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-2.5-pro-exp-03-25'
+  })
   const chatSession = model.startChat()
   return chatSession
 }
@@ -129,7 +132,10 @@ export async function generateUserResponse(
   const result = await chatSession.sendMessage(prompt_template)
   const responseText = cleanResponse(result.response.text())
 
-  const jsonResponse: { response: string } = JSON.parse(responseText)
+  const jsonResponse: {
+    response: string
+    actions: Action[]
+  } = JSON.parse(responseText)
   console.log('jsonResponse', jsonResponse)
 
   await addToPromptHistory(chatId, 'System', prompt_template)
@@ -159,7 +165,7 @@ export const handleUserInput = async (
   userInput: string,
   diagnosisId: number,
   firstQuery: boolean = false
-): Promise<string> => {
+): Promise<{ response: string; actionsExecuted: boolean }> => {
   let keyPermanentInfo
   let keyDiagnosisInfo
   let diagnosisIds
@@ -208,7 +214,8 @@ export const handleUserInput = async (
   )
 
   const response = modelResponse.response
-  return response
+  await handleActions(modelResponse.actions, diagnosisId)
+  return { response, actionsExecuted: modelResponse.actions.length > 0 }
 }
 
 const handleFirstQuery = async (

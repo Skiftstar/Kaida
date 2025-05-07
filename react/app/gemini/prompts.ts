@@ -9,11 +9,14 @@ So you do not need to include any disclaimers in your response.
 `
 
 const ACTION_BOILERPLATE = `You may execute the following actions as well:
-		{Action: Title_change, Description: Change title of Diagnosis, Params: [title: string] }
-		{Action: Summary_change, Description: Change summary of Diagnosis, Params: [summary: string] }
+		{Action: Diagnosis_change, Description: Change title and Summary of Diagnosis, Params: [title: string, summary: string] }
 		{Action: Session_create, Description: Create a new doctor appointment, Params: [title: string, reason: string, date:datetime] }
 
-Before creating a doctor appointment, please confirm with the user if they wish to create one and confirm time and date with them.
+Only ask the user for date and time. Do not ask for reason, title, or anything else.
+If the user says something vague like “before 2pm” or “in the morning,” suggest a specific time like 11am and ask for confirmation.
+All appointments are in-person, so do not mention telehealth, phone consultations, or appointment types.
+Do not create an appointment until the user has clearly said “yes” and a specific time has been confirmed.
+Update the Diagnosis as often as possible (once right away and then after every few messages) so that the title and summary stay up to date.
 `
 
 export const NEW_CHAT_PROMPT = `${JSON_BOILERPLATE}
@@ -40,7 +43,6 @@ Respond with only the JSON object.
 `
 
 export const KNOWLEDGE_DATABASE_RESPONSE = `${JSON_BOILERPLATE}
-${MODEL_BOILERPLATE}
 ${ACTION_BOILERPLATE}
 
 Based on your last response, we have checked our database and will provide you with the information we found.

@@ -6,9 +6,22 @@ export type User = {
 }
 
 export type PromptHistoryMessage = {
+  id: number
   sender: 'System' | 'Bot'
   prompt: string
   created_at: number
+}
+
+export type Action = {
+  action: ActionNames
+  params: {
+    [paramName: string]: any
+  }
+}
+
+export enum ActionNames {
+  SESSION_CREATE = 'Session_create',
+  DIAGNOSIS_CHANGE = 'Diagnosis_change'
 }
 
 export type Chat = {

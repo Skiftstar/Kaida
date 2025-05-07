@@ -68,7 +68,10 @@ export function SideLayout() {
                   </button>
                 </div>
               )}
-              <span style={{ fontWeight: 'bold', fontSize: '26px' }}>
+              <span
+                style={{ fontWeight: 'bold', fontSize: '26px' }}
+                className="text-nowrap overflow-hidden truncate"
+              >
                 {currentScreen}
               </span>
               <button
