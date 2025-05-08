@@ -75,8 +75,8 @@ export function Navbar({
           {navbarOpen && (
             <div>
               <img
-                src={'https://placehold.co/600x400.png'} // Replace with your icon URL
-                style={{ width: 'full', height: '200px' }}
+                src={isDark ? 'kaidabannerB.png' : 'kaidabannerL.png'}
+                style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                 alt="navbar"
               />
               <div style={{ marginLeft: '10px' }}>
