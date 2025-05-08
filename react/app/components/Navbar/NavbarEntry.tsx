@@ -1,13 +1,16 @@
-import { useNavigate } from "react-router"
+import type { ReactElement } from 'react'
+import { useNavigate } from 'react-router'
 
 export function NavbarEntry({
   name,
   path,
+  icon,
   setCurrentScreen,
-  toggleNavbar,
+  toggleNavbar
 }: {
   name: string
   path: string
+  icon: React.ReactElement
   setCurrentScreen: (screen: string) => void
   toggleNavbar: () => void
 }) {
@@ -22,18 +25,15 @@ export function NavbarEntry({
         toggleNavbar()
       }}
       style={{
-        padding: "10px",
-        display: "flex",
-        flexDirection: "row",
-        alignItems: "center",
+        padding: '10px',
+        gap: '10px',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center'
       }}
     >
-      <img
-        src="https://placehold.co/400.png" // Replace with your icon URL
-        style={{ width: "26px", height: "26px", marginRight: "10px" }}
-        alt="icon"
-      />
-      <span style={{ fontSize: "26px" }}>{name}</span>
+      {icon}
+      <span style={{ fontSize: '26px' }}>{name}</span>
     </button>
   )
 }

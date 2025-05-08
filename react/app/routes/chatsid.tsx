@@ -10,6 +10,8 @@ import { createChatSession, handleUserInput } from '~/gemini/gemini'
 import type { ChatSession } from '@google/generative-ai'
 import { usePage } from '~/contexts/PageContext'
 import { ChatSettingsPopup } from '~/components/Popups/ChatSettingsPopup'
+import SettingsIcon from '@mui/icons-material/Settings'
+import SendIcon from '@mui/icons-material/Send'
 
 export default function ChatsDetail() {
   const { id } = useParams()
@@ -105,7 +107,10 @@ export default function ChatsDetail() {
       }
     ])
 
-    if (actionsExecuted) fetchChatCoreInfo()
+    if (actionsExecuted) {
+      await fetchChatCoreInfo()
+      await fetchChatMsgs()
+    }
 
     setModelThinking(false)
   }
@@ -206,7 +211,7 @@ export default function ChatsDetail() {
       </div>
       <div className="mt-2 ml-2 w-full items-center justify-center flex">
         <button
-          className="font-bold text-xl rounded-full justify-center items-center mr-2 h-[40px] w-[40px] flex bg-[#bfbfbf]"
+          className="font-bold text-xl rounded-full justify-center items-center mr-2 h-[40px] min-w-[40px] flex bg-[#bfbfbf]"
           style={{
             fontWeight: 'bold',
             backgroundColor: modelThinking
@@ -219,7 +224,7 @@ export default function ChatsDetail() {
           }}
           disabled={modelThinking}
         >
-          {'S'}
+          <SettingsIcon />
         </button>
         <textarea
           className="textInput"
@@ -240,7 +245,7 @@ export default function ChatsDetail() {
           }}
         />
         <button
-          className="font-bold text-xl rounded-full justify-center items-center ml-2 mr-4 h-[40px] w-[40px] flex bg-[#bfbfbf]"
+          className="font-bold text-xl rounded-full justify-center items-center ml-2 mr-4 h-[40px] min-w-[40px] flex bg-[#bfbfbf]"
           style={{
             fontWeight: 'bold',
             backgroundColor: modelThinking
@@ -255,7 +260,7 @@ export default function ChatsDetail() {
           }}
           disabled={modelThinking}
         >
-          {'>'}
+          <SendIcon />
         </button>
       </div>
     </div>

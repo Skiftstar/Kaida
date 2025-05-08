@@ -214,7 +214,7 @@ export const handleUserInput = async (
   )
 
   const response = modelResponse.response
-  await handleActions(modelResponse.actions, diagnosisId)
+  await handleActions(modelResponse.actions, diagnosisId, chatId)
   return { response, actionsExecuted: modelResponse.actions.length > 0 }
 }
 

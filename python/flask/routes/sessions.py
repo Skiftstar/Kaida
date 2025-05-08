@@ -15,7 +15,7 @@ def get_user_sessions():
     sessions = [{
         "id": row[0],
         "title": row[1],
-        "time": row[2],
+        "time": int(row[2].timestamp() * 1000),
         "reason": row[3],
         "diagnosisId": row[4],
     } for row in rows]

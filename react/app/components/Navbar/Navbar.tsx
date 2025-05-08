@@ -1,11 +1,17 @@
-import { NavbarEntry } from "./NavbarEntry.js"
+import type { ReactElement } from 'react'
+import { NavbarEntry } from './NavbarEntry.js'
+import ChatIcon from '@mui/icons-material/Chat'
+import MedicationIcon from '@mui/icons-material/Medication'
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
+import LightModeIcon from '@mui/icons-material/LightMode'
 
 export function Navbar({
   toggleTheme,
   isDark,
   setCurrentScreen,
   navbarOpen,
-  toggleNavbar,
+  toggleNavbar
 }: {
   toggleTheme: () => void
   isDark: boolean
@@ -14,49 +20,53 @@ export function Navbar({
   toggleNavbar: () => void
 }) {
   const baseStyle = {
-    width: navbarOpen ? "60%" : "0%",
+    width: navbarOpen ? '60%' : '0%'
   }
 
-  const navElements: { path: string; name: string }[] = [
-    { path: "/", name: "Chats" },
-    { path: "/meds", name: "Medication" },
-    { path: "/sessions", name: "Sessions" },
+  const navElements: {
+    path: string
+    name: string
+    icon: React.ReactElement
+  }[] = [
+    { path: '/', name: 'Chats', icon: <ChatIcon /> },
+    { path: '/meds', name: 'Medication', icon: <MedicationIcon /> },
+    { path: '/sessions', name: 'Sessions', icon: <CalendarMonthIcon /> }
   ]
 
   return (
     <div
       style={{
-        position: "absolute",
-        height: "100%",
-        aspectRatio: "9 / 19",
-        top: "0",
-        left: "0",
-        display: navbarOpen ? "block" : "none",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        position: 'absolute',
+        height: '100%',
+        aspectRatio: '9 / 19',
+        top: '0',
+        left: '0',
+        display: navbarOpen ? 'block' : 'none',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)'
       }}
     >
       <div
         style={{
-          position: "absolute",
-          height: "100%",
-          aspectRatio: "9 / 19",
-          display: navbarOpen ? "block" : "none",
-          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          position: 'absolute',
+          height: '100%',
+          aspectRatio: '9 / 19',
+          display: navbarOpen ? 'block' : 'none',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)'
         }}
         onClick={toggleNavbar}
       >
         <div
-          className={`navbar`}
+          className={`navbar ${navbarOpen ? 'navbar-anim' : 'navbar-close'}`}
           style={{
             width: baseStyle.width,
-            position: "absolute",
-            top: "0",
-            height: "100vh",
-            display: "flex",
-            flexDirection: "column",
-            gap: "10px",
-            transition: "width 0.1s ease-in",
-            overflow: "hidden",
+            position: 'absolute',
+            top: '0',
+            height: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            transition: 'width 0.1s ease-in',
+            overflow: 'hidden'
           }}
           onClick={(e) => {
             e.stopPropagation()
@@ -65,15 +75,16 @@ export function Navbar({
           {navbarOpen && (
             <div>
               <img
-                src={"https://placehold.co/600x400.png"} // Replace with your icon URL
-                style={{ width: "full", height: "200px" }}
+                src={'https://placehold.co/600x400.png'} // Replace with your icon URL
+                style={{ width: 'full', height: '200px' }}
                 alt="navbar"
               />
-              <div style={{ marginLeft: "10px" }}>
-                {navElements.map(({ path, name }) => (
+              <div style={{ marginLeft: '10px' }}>
+                {navElements.map(({ path, name, icon }) => (
                   <NavbarEntry
                     name={`${name}`}
                     path={path}
+                    icon={icon}
                     setCurrentScreen={setCurrentScreen}
                     key={path}
                     toggleNavbar={toggleNavbar}
@@ -83,8 +94,22 @@ export function Navbar({
             </div>
           )}
           {navbarOpen && (
-            <button onClick={toggleTheme}>
-              <span>{isDark ? "Light" : "Dark"} Mode</span>
+            <button
+              onClick={toggleTheme}
+              style={{
+                padding: '10px',
+                marginTop: 'auto',
+                marginLeft: '10px',
+                gap: '10px',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center'
+              }}
+            >
+              {isDark ? <LightModeIcon /> : <DarkModeIcon />}
+              <span style={{ fontSize: '26px' }}>
+                {isDark ? 'Light' : 'Dark'} Mode
+              </span>
             </button>
           )}
         </div>

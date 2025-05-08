@@ -2,7 +2,6 @@
   --color-text: #000;
   --background-color: #fff;
   --textinput-background-color: #e8e8e8;
-  /* --usermessage-background-color: #e0f7fa; */
   --usermessage-background-color: #5ed8f5;
   --botmessage-background-color: #f1f8e9;
   --systemmessage-background-color: #f4f4f4;
@@ -51,4 +50,26 @@ input {
 .systemMessage {
   background-color: var(--systemmessage-background-color);
   border-radius: 0px !important;
+}
+
+.navbar {
+  left: -250px;
+  transition: left 0.1s ease-in-out;
+}
+
+.navbar-close {
+  left: -250px;
+}
+
+.navbar-anim {
+  animation: slideIn 0.3s forwards;
+}
+
+@keyframes slideIn {
+  from {
+    left: -250px; /* Start off-screen */
+  }
+  to {
+    left: 0; /* End at 0 (visible on the screen) */
+  }
 }

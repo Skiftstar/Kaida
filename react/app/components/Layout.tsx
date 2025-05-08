@@ -70,7 +70,7 @@ export function SideLayout() {
               )}
               <span
                 style={{ fontWeight: 'bold', fontSize: '26px' }}
-                className="text-nowrap overflow-hidden truncate"
+                className="text-nowrap overflow-hidden truncate max-w-[70%]"
               >
                 {currentScreen}
               </span>
@@ -81,11 +81,9 @@ export function SideLayout() {
                 }}
                 className="ml-auto mr-5"
               >
-                <img
-                  src="https://placehold.co/50x50.png"
-                  alt="profile"
-                  className="rounded-full w-[40px]"
-                />
+                <div className="w-[40px] h-[40px] rounded-full !bg-[var(--textinput-background-color)] flex items-center justify-center">
+                  <span>{user.username.substring(0, 2).toUpperCase()}</span>
+                </div>
               </button>
             </div>
           )}

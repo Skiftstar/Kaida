@@ -61,7 +61,7 @@ export function SessionsPopup({
       const isUpdated = await updateSession(
         selectedSession.id,
         title,
-        time!.toISOString(),
+        time!.toLocaleString(),
         reason,
         diagnosisId
       )
@@ -141,8 +141,8 @@ export function SessionsPopup({
                 required={true}
                 onChange={(date) => setTime(date)}
                 showTimeSelect
-                dateFormat="mm/dd/yy h:mm aa"
-                placeholderText="mm/dd/yy h:mm aa"
+                dateFormat="MM/dd/yy h:mm aa"
+                placeholderText="MM/dd/yy h:mm aa"
               />
             </div>
           </div>

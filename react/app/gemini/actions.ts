@@ -1,35 +1,83 @@
 import { ActionNames, type Action } from '~/types'
-import { updateDiagnosis } from '~/util/Api'
+import {
+  createSession,
+  insertNewChatMessage,
+  updateDiagnosis
+} from '~/util/Api'
 
-type DiagnosisChangeAction = {
-  action: string
-  params: {
-    title: string
-    summary: string
-  }
+type DiagnosisChangeParams = {
+  title: string
+  summary: string
 }
 
-export const handleActions = async (actions: Action[], diagnosisId: number) => {
+type SessionCreateParams = {
+  title: string
+  reason: string
+  date: string
+}
+
+export const handleActions = async (
+  actions: Action[],
+  diagnosisId: number,
+  chatId: number
+) => {
   actions.forEach((action) => {
     switch (action.action) {
       case ActionNames.DIAGNOSIS_CHANGE:
-        handleDiagnosisChange(action as DiagnosisChangeAction, diagnosisId)
+        handleDiagnosisChange(
+          action.params as DiagnosisChangeParams,
+          diagnosisId
+        )
+        break
+      case ActionNames.SESSION_CREATE:
+        handleSessionCreate(
+          action.params as SessionCreateParams,
+          diagnosisId,
+          chatId
+        )
         break
     }
   })
 }
 
 const handleDiagnosisChange = async (
-  action: DiagnosisChangeAction,
+  params: DiagnosisChangeParams,
   diagnosisId: number
 ) => {
   const isUpdated = await updateDiagnosis(
     diagnosisId,
-    action.params.title,
-    action.params.summary,
+    params.title,
+    params.summary,
     false,
     false
   )
 
   if (!isUpdated) return //TODO: error handling
+}
+
+const handleSessionCreate = async (
+  params: SessionCreateParams,
+  diagnosisId: number,
+  chatId: number
+) => {
+  const id = await createSession(
+    params.title,
+    params.date,
+    params.reason,
+    diagnosisId
+  )
+
+  if (!id) return //TODO: error handling
+
+  const msgId = await insertNewChatMessage(
+    'System',
+    `Created new Session "${params.title}"
+
+	Reason: "${params.reason}"
+
+	Date: ${params.date}`,
+    chatId
+  )
+
+  if (!msgId) return //TODO: error handling
 }
