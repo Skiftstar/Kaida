@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   postgres:
-    image: ankane/pgvector # Prebuilt PostgreSQL with pgvector
+    image: pgvector/pgvector:0.8.0-pg17 # Prebuilt PostgreSQL with pgvector
     container_name: pgvector_db
     environment:
       POSTGRES_USER: myuser

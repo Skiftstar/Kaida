@@ -56,14 +56,11 @@ def createNewChat():
 @login_required
 @chats_bp.route("<id>/get-messages", methods=["GET"])
 def get_all_messages_of_chat(id):
-    print("called!")
     rows = execute_and_fetchall_query("SELECT id, message, sender FROM chat_messages WHERE chat_id=%s ORDER BY created_at ASC", (id,))
 
     if not rows:
        return jsonify("error fetching chat messages"), 500
    
-    print(rows)
-
     messages = [{
        "id": row[0],
        "message": row[1],
