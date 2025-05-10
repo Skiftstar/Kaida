@@ -86,3 +86,16 @@ User response: {{user_response}}
 
 Respond with only the JSON object.
 `
+
+export const CONTEXT_FILL_PROMPT = `You will be fed multiple prompts from a previous chat session, this is to refresh your context for the specific chat.
+Format of the message will be:
+[
+	{
+		"sender": "AI or System",
+		"prompt": "The Prompt"
+	}
+]
+If all prompts have been fed to you, the message will end with "DONE :D"
+to each message only respond with "Acknowledged"
+Reply with "Acknowledged" if you understood these instuctions. Afterwards we will start feeding prompts to you.
+`
