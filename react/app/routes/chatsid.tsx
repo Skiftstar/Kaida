@@ -6,7 +6,11 @@ import {
   insertNewChatMessage
 } from '~/util/Api'
 import type { ChatInfo, Message } from '~/types'
-import { createChatSession, handleUserInput } from '~/gemini/gemini'
+import {
+  createChatSession,
+  handleChatContinuation,
+  handleUserInput
+} from '~/gemini/gemini'
 import type { ChatSession } from '@google/generative-ai'
 import { usePage } from '~/contexts/PageContext'
 import { ChatSettingsPopup } from '~/components/Popups/ChatSettingsPopup'
@@ -28,6 +32,7 @@ export default function ChatsDetail() {
     undefined
   )
   const [settingsPopup, setSettingsPopup] = useState(false)
+  const [freshSession, setFreshSession] = useState(true)
 
   useEffect(() => {
     fetchChatMsgs()
@@ -63,6 +68,14 @@ export default function ChatsDetail() {
 
   const handleMessageSend = async (message: string) => {
     if (!chatSession || !chatCoreInfo) return
+
+    if (
+      freshSession &&
+      textmsgs.find((msg) => msg.sender === 'Bot') !== undefined
+    ) {
+      await handleChatContinuation(chatSession, chatCoreInfo.id)
+      setFreshSession(false)
+    }
 
     const messageId = await insertNewChatMessage('User', message, Number(id))
 
@@ -149,8 +162,8 @@ export default function ChatsDetail() {
                   msg.sender === 'User'
                     ? 'end'
                     : msg.sender === 'Bot'
-                      ? 'start'
-                      : 'center',
+                    ? 'start'
+                    : 'center',
                 borderRadius: '10px',
                 padding: '5px',
                 marginRight: '10px',
@@ -163,8 +176,8 @@ export default function ChatsDetail() {
                   msg.sender === 'User'
                     ? 'userMessage'
                     : msg.sender === 'Bot'
-                      ? 'botMessage'
-                      : 'systemMessage'
+                    ? 'botMessage'
+                    : 'systemMessage'
                 }
                 style={{
                   borderRadius: '10px',

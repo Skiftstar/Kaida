@@ -2,7 +2,7 @@ import { useNavigate, useParams } from 'react-router'
 import { Popup } from '../Popup'
 import { deleteDiagnosis, updateDiagnosis } from '~/util/Api'
 import type { ChatInfo } from '~/types'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { PromptHistoryDisplay } from '../PromptHistoryDisplay'
 
 export function ChatSettingsPopup({
@@ -22,7 +22,10 @@ export function ChatSettingsPopup({
   const [showEmbeddings, setShowEmbeddings] = useState(false)
   const [actionPending, setActionPending] = useState(false)
 
-  const { id: chatId } = useParams()
+  useEffect(() => {
+    setTitle(chatCoreInfo.title)
+    setSummary(chatCoreInfo.summary)
+  }, [chatCoreInfo])
 
   const nav = useNavigate()
 

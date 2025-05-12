@@ -1,11 +1,13 @@
 import { ChatSession, GoogleGenerativeAI } from '@google/generative-ai'
 import {
+  CONTEXT_FILL_PROMPT,
   FOLLOW_UP_PROMPT,
   KNOWLEDGE_DATABASE_RESPONSE,
   NEW_CHAT_PROMPT
 } from './prompts'
 import {
   addToPromptHistory,
+  fetchPromptHistory,
   getRecentDiagnoses,
   getUserPrescriptions,
   searchEmbeddings,
@@ -18,6 +20,8 @@ import { handleActions } from './actions'
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
 const DIAGNOSES_COUNT = import.meta.env.VITE_RECENT_DIAGNOSES_COUNT
 const MEDICAL_PLAN_LIMIT = import.meta.env.VITE_MEDICAL_PLAN_LIMIT // How old (in days) medical plans can be to still be considered relevant
+const CONTEXT_REFRESH_CHUNK_SIZE = import.meta.env
+  .VITE_CONTEXT_REFRESH_CHUNK_SIZE // How many messages will be sent at once per context refesh message
 
 if (!GEMINI_API_KEY) {
   throw new Error('Missing VITE_GEMINI_API_KEY in .env file')
@@ -305,4 +309,36 @@ const extractKeyInfo = async (
   }
 
   return info
+}
+
+export const handleChatContinuation = async (
+  chatSession: ChatSession,
+  chatId: number
+) => {
+  const prompts = await fetchPromptHistory(chatId)
+
+  if (!prompts) return //TODO: error handling
+
+  let response = await chatSession.sendMessage(CONTEXT_FILL_PROMPT)
+  let responseText = cleanResponse(response.response.text())
+  if (responseText !== 'Acknowledged') return //TODO: Error handling
+
+  for (let i = 0; i < prompts.length; i += CONTEXT_REFRESH_CHUNK_SIZE) {
+    const chunk = prompts.slice(i, i + CONTEXT_REFRESH_CHUNK_SIZE)
+    const isLast = i + 4 >= prompts.length
+
+    const formattedPrompts = chunk.map((prompt) => {
+      return {
+        sender: prompt.sender,
+        prompt: prompt.prompt
+      }
+    })
+    const input = `${JSON.stringify(formattedPrompts)} ${
+      isLast ? 'DONE :D' : ''
+    }`
+
+    response = await chatSession.sendMessage(input)
+    responseText = cleanResponse(response.response.text())
+    if (responseText !== 'Acknowledged') return //TODO: Error handling
+  }
 }
