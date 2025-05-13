@@ -1,25 +1,55 @@
-import { useNavigate } from "react-router"
-import { usePage } from "~/contexts/PageContext"
-import { useUser } from "~/contexts/UserContext"
-import { logoutUser } from "~/util/Api"
+import { Skeleton } from '@mui/material'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { PermanentEmbeddingsPopup } from '~/components/Popups/PermanentEmbeddingsPopup'
+import { usePage } from '~/contexts/PageContext'
+import { useUser } from '~/contexts/UserContext'
+import type { Embedding } from '~/types'
+import { fetchAllUserEmbeddings, logoutUser } from '~/util/Api'
 
 export default function ProfileRoute() {
+  const [embeddings, setEmbeddings] = useState<Embedding[] | undefined>(
+    undefined
+  )
+  const [embeddingsPopupOpen, setEmbeddingsPopupOpen] = useState(false)
   const { user, setUser } = useUser()
   const nav = useNavigate()
 
   const { setCurrPage } = usePage()
-  setCurrPage("Profile")
+  setCurrPage('Profile')
+
+  useEffect(() => {
+    fetchEmbeddings()
+  }, [])
+
+  const fetchEmbeddings = async () => {
+    const embeddings = await fetchAllUserEmbeddings()
+
+    if (!embeddings) return //TODO: error handling
+
+    setEmbeddings(embeddings)
+  }
 
   const handleLogout = async () => {
     const successfulLogout = await logoutUser()
     if (successfulLogout) {
-      nav("/login")
+      nav('/login')
       setUser(undefined)
     }
   }
 
   return (
     <div className="flex h-[calc(100vh-65px)] flex-col">
+      {embeddings && (
+        <PermanentEmbeddingsPopup
+          open={embeddingsPopupOpen}
+          embeddings={embeddings}
+          onClose={() => {
+            setEmbeddingsPopupOpen(false)
+          }}
+        />
+      )}
+
       <div className="flex flex-col gap-6 m-4">
         <div className="w-full">
           <div className="border-b-1 w-full">
@@ -40,7 +70,24 @@ export default function ProfileRoute() {
             <span className="text-lg">Push-Notifications</span>
           </div>
           <span className="flex justify-center font-bold text-xl">
-            {user?.push_notifications_enabled ? "Enabled" : "Disabled"}
+            {user?.push_notifications_enabled ? 'Enabled' : 'Disabled'}
+          </span>
+        </div>
+        <div className="w-full">
+          <div className="border-b-1 w-full">
+            <span className="text-lg">Knowledge Base</span>
+          </div>
+          <span className="flex justify-center font-bold text-xl">
+            {embeddings ? (
+              <span
+                onClick={() => {
+                  setEmbeddingsPopupOpen(true)
+                }}
+                className="cursor-pointer"
+              >{`${embeddings.length} Knowledge`}</span>
+            ) : (
+              <Skeleton className="w-1/2" />
+            )}
           </span>
         </div>
       </div>

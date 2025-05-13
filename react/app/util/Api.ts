@@ -2,6 +2,7 @@ import type {
   Chat,
   ChatInfo,
   Diagnosis,
+  Embedding,
   Message,
   Prescription,
   PrescriptionDoseUnit,
@@ -364,4 +365,14 @@ export const fetchPromptHistory = async (
   if (response.status !== 200) return undefined
 
   return response.data.history
+}
+
+export const fetchAllUserEmbeddings = async (): Promise<
+  Embedding[] | undefined
+> => {
+  const response = await get('/embeddings/all')
+
+  if (response.status !== 200) return undefined
+
+  return response.data.embeddings
 }

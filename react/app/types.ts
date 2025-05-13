@@ -12,6 +12,11 @@ export type PromptHistoryMessage = {
   created_at: number
 }
 
+export type Embedding = {
+  id: number
+  text: string
+}
+
 export type Action = {
   action: ActionNames
   params: {

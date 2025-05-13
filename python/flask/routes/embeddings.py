@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from datetime import datetime, timezone
 from sentence_transformer import model
-from db import get_db_connection
+from db import get_db_connection, execute_and_fetchall_query 
 from . import embeddings_bp 
 from flask_login import login_required, current_user
 
@@ -159,3 +159,19 @@ def search_similar_many():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@login_required
+@embeddings_bp.route("all", methods=["GET"])
+def get_all_user_embeddings():
+    results = execute_and_fetchall_query("SELECT id, text FROM embeddings WHERE user_id = %s", (current_user.id, ))
+
+    if results is None:
+        return jsonify("Error fetching user embeddings"), 500
+
+
+    embeddings = [{
+        "id": row[0],
+        "text": row[1],
+    } for row in results]
+
+    return jsonify({"embeddings": embeddings}), 200
