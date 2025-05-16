@@ -4,6 +4,13 @@ from sentence_transformer import model
 from db import get_db_connection, execute_and_fetchall_query 
 from . import embeddings_bp 
 from flask_login import login_required, current_user
+import ast
+
+def cosine_sim(v1, v2):
+    dot = sum(a * b for a, b in zip(v1, v2))
+    norm1 = sum(a * a for a in v1) ** 0.5
+    norm2 = sum(b * b for b in v2) ** 0.5
+    return dot / (norm1 * norm2) if norm1 and norm2 else 0
 
 @login_required
 @embeddings_bp.route("insert", methods=["POST"])
@@ -39,11 +46,9 @@ def insert_embedding():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-
-@login_required
 @embeddings_bp.route("insert-many", methods=["POST"])
-def insert_many_embeddings():
-    """Insert multiple text embeddings into the database."""
+@login_required
+def insert_many_embeddings_redo():
     data = request.json
     texts = data.get("texts")
 
@@ -54,36 +59,38 @@ def insert_many_embeddings():
         conn = get_db_connection()
         cur = conn.cursor()
 
+        # Encode all texts once
+        encoded_texts = [(text, model.encode(text).tolist()) for text in texts]
+
+        # Fetch all existing embeddings for current user once
+        cur.execute("SELECT text, embedding FROM embeddings WHERE user_id = %s", (current_user.id,))
+        raw = cur.fetchall()
+        print(raw)
+        existing = [(text, ast.literal_eval(embedding)) for text, embedding in raw]
+
+        print(existing)
+
+        # Filter out texts that are too similar to existing ones
+        threshold = 0.9
         to_insert = []
-
-        for text in texts:
-            # Check if similiar text exists
-            query_vector = model.encode(text).tolist()
-            cur.execute("""
-            SELECT text, embedding <=> %s::vector AS distance
-            FROM embeddings
-            WHERE user_id = %s
-            ORDER BY distance
-            LIMIT %s;
-            """, (query_vector, current_user.id, 1))
-
-            results = [{"text": row[0], "distance": row[1]} for row in cur.fetchall()]
-
-            if len(results) > 0 and results[0]["distance"] < 0.1:
-                print(f"Similiar text to '{text}' already exists in the database: {results[0]['text']}")
+        for text, emb in encoded_texts:
+            for e in existing:
+                print(cosine_sim(emb, e[1]))
+            if any(cosine_sim(emb, e[1]) > threshold for e in existing):
+                print(f"Skipped similar text: {text}")
                 continue
-            else:
-                to_insert.append(text)
+            to_insert.append((text, emb))
 
-        for text in to_insert:
-            embedding = model.encode(text).tolist()
-            cur.execute("INSERT INTO embeddings (text, embedding, user_id) VALUES (%s, %s, %s)", (text, embedding, current_user.id))
+        # Batch insert all new embeddings at once
+        if to_insert:
+            args_str = ",".join(cur.mogrify("(%s, %s, %s)", (t[0], t[1], current_user.id)).decode('utf-8') for t in to_insert)
+            cur.execute("INSERT INTO embeddings (text, embedding, user_id) VALUES " + args_str)
             conn.commit()
 
         cur.close()
         conn.close()
 
-        return jsonify({"message": f"Texts successfully inserted: {', '.join(to_insert)}"}), 201
+        return jsonify({"message": f"Texts successfully inserted: {', '.join(t[0] for t in to_insert)}"}), 201
 
     except Exception as e:
         print(f"Error: {e}")
