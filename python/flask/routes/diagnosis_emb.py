@@ -12,7 +12,7 @@ def get_all_embeddings(id):
         conn = get_db_connection()
         cur = conn.cursor()
 
-        cur.execute("SELECT embedding FROM embeddings WHERE diagnosis_id = %s", (id,))
+        cur.execute("SELECT embedding FROM diagnosis_embeddings WHERE diagnosis_id = %s", (id,))
         rows = cur.fetchall()
         cur.close()
         conn.close()
@@ -46,7 +46,7 @@ def insert_embedding(id):
         # Compute embedding
         embedding = model.encode(text).tolist()
 
-        cur.execute("INSERT INTO embeddings (text, embedding, diagnosis_id) VALUES (%s, %s, %s)", (text, embedding, id))
+        cur.execute("INSERT INTO diagnosis_embeddings (text, embedding, diagnosis_id) VALUES (%s, %s, %s)", (text, embedding, id))
         conn.commit()
         cur.close()
         conn.close()

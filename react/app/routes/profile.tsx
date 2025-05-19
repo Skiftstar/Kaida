@@ -47,6 +47,7 @@ export default function ProfileRoute() {
           onClose={() => {
             setEmbeddingsPopupOpen(false)
           }}
+          refetch={fetchEmbeddings}
         />
       )}
 
@@ -84,7 +85,9 @@ export default function ProfileRoute() {
                   setEmbeddingsPopupOpen(true)
                 }}
                 className="cursor-pointer"
-              >{`${embeddings.length} Knowledge`}</span>
+              >{`${embeddings.length} Knowledge ${
+                embeddings.length === 1 ? 'Entry' : 'Entries'
+              }`}</span>
             ) : (
               <Skeleton className="w-1/2" />
             )}

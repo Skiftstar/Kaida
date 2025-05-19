@@ -208,7 +208,9 @@ export const deleteChat = async (chatId: string) => {
   return true
 }
 
-export const deleteDiagnosis = async (diagnosisId: number) => {
+export const deleteDiagnosis = async (
+  diagnosisId: number
+): Promise<boolean> => {
   const response = await del(`/diagnosis/${diagnosisId}`)
 
   if (response.status !== 204) return false
@@ -375,4 +377,14 @@ export const fetchAllUserEmbeddings = async (): Promise<
   if (response.status !== 200) return undefined
 
   return response.data.embeddings
+}
+
+export const deleteUserEmbedding = async (
+  embeddingId: number
+): Promise<boolean> => {
+  const response = await del(`/embeddings/${embeddingId}`)
+
+  if (response.status !== 204) return false
+
+  return true
 }

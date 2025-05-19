@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from datetime import datetime, timezone
 from sentence_transformer import model
-from db import get_db_connection, execute_and_fetchall_query 
+from db import get_db_connection, execute_and_fetchall_query, execute_query 
 from . import embeddings_bp 
 from flask_login import login_required, current_user
 import ast
@@ -182,3 +182,13 @@ def get_all_user_embeddings():
     } for row in results]
 
     return jsonify({"embeddings": embeddings}), 200
+
+@login_required
+@embeddings_bp.route("<embedding_id>", methods=["DELETE"])
+def delete_user_embedding(embedding_id):
+    is_deleted = execute_query("DELETE FROM embeddings WHERE id = %s", (embedding_id,)) 
+
+    if not is_deleted:
+        return jsonify({"error deleting embedding"}), 500
+
+    return jsonify({}), 204
