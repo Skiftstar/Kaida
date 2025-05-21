@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from datetime import datetime, timezone
 from sentence_transformer import model
-from db import get_db_connection, execute_and_fetchall_query, execute_query 
+from db import get_db_connection, execute_and_fetchall_query, execute_query, execute_and_fetchone_query 
 from . import embeddings_bp 
 from flask_login import login_required, current_user
 import ast
@@ -22,29 +22,14 @@ def insert_embedding():
     if not text:
         return jsonify({"error": "Missing 'text' field"}), 400
 
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
+    embedding = model.encode(text).tolist()
+    embedding_id = execute_and_fetchone_query("INSERT INTO embeddings (text, embedding, user_id) VALUES (%s, %s, %s) RETURNING id", (text, embedding, current_user.id))
 
-        # Check if text exists
-        cur.execute("SELECT 1 FROM embeddings WHERE text = %s AND user_id = %s;", (text, current_user.id))
-        if cur.fetchone():
-            cur.close()
-            conn.close()
-            return jsonify({"message": "Text already exists"}), 409
 
-        # Compute embedding
-        embedding = model.encode(text).tolist()
+    if not embedding_id:
+        return jsonify("error creating embedding"), 500
 
-        cur.execute("INSERT INTO embeddings (text, embedding, user_id) VALUES (%s, %s, %s)", (text, embedding, current_user.id))
-        conn.commit()
-        cur.close()
-        conn.close()
-
-        return jsonify({"message": "Inserted successfully"}), 201
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+    return jsonify({"id": embedding_id}), 201
     
 @embeddings_bp.route("insert-many", methods=["POST"])
 @login_required
@@ -192,3 +177,20 @@ def delete_user_embedding(embedding_id):
         return jsonify({"error deleting embedding"}), 500
 
     return jsonify({}), 204
+
+@login_required
+@embeddings_bp.route("<embedding_id>", methods=["PUT"])
+def update_embedding(embedding_id):
+    data = request.json
+    text = data.get("text")
+
+    if not text:
+        return jsonify({"error": "Missing 'text' field"}), 400
+
+    embedding = model.encode(text).tolist()
+    updated = execute_query("UPDATE embeddings SET text = %s, embedding = %s WHERE id = %s", (text, embedding, embedding_id))
+
+    if not updated:
+        return jsonify("Failed updating session!"), 500
+
+    return jsonify({}), 200

@@ -388,3 +388,24 @@ export const deleteUserEmbedding = async (
 
   return true
 }
+
+export const updateUserEmbedding = async (
+  embeddingId: number,
+  text: string
+): Promise<boolean> => {
+  const response = await put(`/embeddings/${embeddingId}`, { text })
+
+  if (response.status !== 200) return false
+
+  return true
+}
+
+export const insertSingleUserEmbedding = async (
+  text: string
+): Promise<number | undefined> => {
+  const response = await post(`/embeddings/insert`, { text })
+
+  if (response.status !== 201) return undefined
+
+  return response.data.id
+}
