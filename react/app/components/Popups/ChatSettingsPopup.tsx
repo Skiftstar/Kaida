@@ -4,6 +4,7 @@ import { deleteDiagnosis, updateDiagnosis } from '~/util/Api'
 import type { ChatInfo } from '~/types'
 import { useEffect, useState } from 'react'
 import { PromptHistoryDisplay } from '../PromptHistoryDisplay'
+import { useToast } from '~/contexts/ToastContext'
 
 export function ChatSettingsPopup({
   open,
@@ -27,13 +28,16 @@ export function ChatSettingsPopup({
     setSummary(chatCoreInfo.summary)
   }, [chatCoreInfo])
 
+  const { setToast } = useToast()
   const nav = useNavigate()
 
   const handleDeleteChat = async () => {
+    setActionPending(true)
     const isDeleted = await deleteDiagnosis(chatCoreInfo.id)
 
+    setActionPending(false)
     if (!isDeleted) {
-      //TODO: Error handling
+      setToast('Failed deleting Chat!')
       return
     }
 
@@ -55,7 +59,10 @@ export function ChatSettingsPopup({
       )
       setActionPending(false)
 
-      if (!wasUpdated) return //TODO: Error handling
+      if (!wasUpdated) {
+        setToast('Failed editing Chat!')
+        return
+      }
       setChatCoreInfo({ ...chatCoreInfo, title, summary })
     }
 

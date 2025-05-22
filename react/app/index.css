@@ -73,3 +73,37 @@ input {
     left: 0; /* End at 0 (visible on the screen) */
   }
 }
+
+.toast {
+  top: -30px;
+}
+
+.toast-open {
+  animation: slideFromTop 0.2s forwards;
+}
+
+.toast-closed {
+  animation: slideBackToTop 0.2s forwards;
+}
+
+@keyframes slideFromTop {
+  from: {
+    top: -30px;
+  }
+  to {
+    top: 20px;
+  }
+}
+
+@keyframes slideBackToTop {
+  from {
+    top: 20px;
+  }
+  to {
+    top: -30px;
+  }
+}
+
+button:disabled {
+  color: gray !important;
+}

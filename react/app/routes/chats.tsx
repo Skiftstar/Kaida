@@ -10,6 +10,7 @@ import {
 } from '~/util/Api'
 import type { Chat } from '~/types'
 import { NEW_CHAT_MESSAGE } from '~/util/MessageTemplates'
+import { useToast } from '~/contexts/ToastContext'
 
 export const meta: MetaFunction = () => {
   return [
@@ -24,6 +25,7 @@ export default function Index() {
   const [chats, setChats] = useState<Chat[]>([])
 
   const { setCurrPage } = usePage()
+  const { setToast } = useToast()
   setCurrPage('Chats')
 
   useEffect(() => {
@@ -40,10 +42,16 @@ export default function Index() {
       'New Diagnosis',
       'New Diagnosis'
     )
-    if (!diagnosis_id) return //TODO: Show error
+    if (!diagnosis_id) {
+      setToast('Failed creating new Chat!')
+      return
+    }
 
     const chat_id = await createNewChat(diagnosis_id)
-    if (!chat_id) return //TODO: Cleanup diagnosis, dispaly error
+    if (!chat_id) {
+      setToast('Failed creating new Chat!')
+      return
+    } //TODO: Cleanup diagnosis
 
     insertNewChatMessage('System', NEW_CHAT_MESSAGE, chat_id)
 

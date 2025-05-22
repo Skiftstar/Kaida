@@ -3,8 +3,8 @@ import { useState, type FormEvent } from 'react'
 import { type Diagnosis, type Session } from '~/types'
 import DatePicker from 'react-datepicker'
 import { createSession, deleteSession, updateSession } from '~/util/Api'
+import { useToast } from '~/contexts/ToastContext'
 
-//TODO: Change Diagnosis Selection to Dropdown from existing ones
 export function SessionsPopup({
   open,
   onClose,
@@ -26,12 +26,19 @@ export function SessionsPopup({
   )
   const [actionPending, setActionPending] = useState(false)
 
+  const { setToast } = useToast()
+
   const handleSessionDelete = async () => {
     if (!selectedSession) return
 
     setActionPending(true)
     const isDeleted = await deleteSession(selectedSession.id)
-    if (!isDeleted) return //TODO: Error handling
+
+    setActionPending(false)
+    if (!isDeleted) {
+      setToast('Failed deleting Session!')
+      return
+    }
 
     selectedSession = undefined
     handleClose(true)
@@ -48,9 +55,12 @@ export function SessionsPopup({
       diagnosisId
     )
 
-    if (!id) return //TODO: Error handling
-
     setActionPending(false)
+    if (!id) {
+      setToast('Failed creating Session!')
+      return
+    }
+
     handleClose(true)
   }
 
@@ -65,8 +75,11 @@ export function SessionsPopup({
         reason,
         diagnosisId
       )
-      if (!isUpdated) return //TODO: Error handling
       setActionPending(false)
+      if (!isUpdated) {
+        setToast('Failed editing Session!')
+        return
+      }
     }
 
     onClose(refresh ?? false)

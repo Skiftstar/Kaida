@@ -10,6 +10,7 @@ import EditIcon from '@mui/icons-material/Edit'
 import ClearIcon from '@mui/icons-material/Clear'
 import DoneIcon from '@mui/icons-material/Done'
 import AddIcon from '@mui/icons-material/Add'
+import { useToast } from '~/contexts/ToastContext'
 
 export function PermanentEmbeddingsPopup({
   open,
@@ -29,11 +30,17 @@ export function PermanentEmbeddingsPopup({
   const [currEditText, setCurrEditText] = useState('')
   const [addingNew, setAddingNew] = useState(false)
 
+  const { setToast } = useToast()
+
   const handleEmbeddingDelete = async (embeddingId: number) => {
     setActionPending(true)
     const isDeleted = await deleteUserEmbedding(embeddingId)
 
-    if (!isDeleted) return //TODO: Error Handling
+    if (!isDeleted) {
+      setToast('Error deleting Embedding!')
+      setActionPending(false)
+      return
+    }
 
     refetch()
     setActionPending(false)
@@ -43,7 +50,11 @@ export function PermanentEmbeddingsPopup({
     setActionPending(true)
     const isUpdated = await updateUserEmbedding(embeddingId, currEditText)
 
-    if (!isUpdated) return //TODO: Error handling
+    if (!isUpdated) {
+      setToast('Error updating Embedding!')
+      setActionPending(false)
+      return
+    }
 
     refetch()
     setCurrEditText('')
@@ -56,7 +67,11 @@ export function PermanentEmbeddingsPopup({
     setActionPending(true)
     const id = await insertSingleUserEmbedding(currEditText)
 
-    if (!id) return //TODO: error handling
+    if (!id) {
+      setToast('Error creating Embedding!')
+      setActionPending(false)
+      return
+    }
 
     refetch()
     setCurrEditText('')
@@ -95,7 +110,7 @@ export function PermanentEmbeddingsPopup({
                   <DoneIcon />
                 </button>
                 <button
-                  className="mr-5 !text-red-700"
+                  className="mr-5 text-red-700"
                   onClick={() => {
                     setAddingNew(false)
                     setCurrEditText('')
@@ -145,7 +160,7 @@ export function PermanentEmbeddingsPopup({
                       <DoneIcon />
                     </button>
                     <button
-                      className="mr-5 !text-red-700"
+                      className="mr-5 text-red-700"
                       onClick={() => {
                         setCurrentEditId(undefined)
                       }}
@@ -171,7 +186,7 @@ export function PermanentEmbeddingsPopup({
                       onClick={() => {
                         handleEmbeddingDelete(embedding.id)
                       }}
-                      className="mr-5 !text-red-700"
+                      className="mr-5 text-red-700"
                     >
                       <ClearIcon />
                     </button>

@@ -11,6 +11,7 @@ import {
   deletePrescription,
   updatePrescription
 } from '~/util/Api'
+import { useToast } from '~/contexts/ToastContext'
 
 export function MedicationPopup({
   open,
@@ -38,12 +39,19 @@ export function MedicationPopup({
   )
   const [actionPending, setActionPending] = useState(false)
 
+  const { setToast } = useToast()
+
   const handleMedicationDelete = async () => {
     if (!selectedPresc) return
 
     setActionPending(true)
     const isDeleted = await deletePrescription(selectedPresc.id)
-    if (!isDeleted) return //TODO: Error handling
+    setActionPending(false)
+
+    if (!isDeleted) {
+      setToast('Failed deleting Prescription!')
+      return
+    }
 
     selectedPresc = undefined
     handleClose(true)
@@ -51,8 +59,10 @@ export function MedicationPopup({
 
   const handleCreateNew = async (e: FormEvent) => {
     e.preventDefault()
-    //TODO: Error handling
-    if (endDate!.getTime() < startDate!.getTime()) return
+    if (endDate!.getTime() < startDate!.getTime()) {
+      setToast('Start Date has to be before End Date!')
+      return
+    }
 
     setActionPending(true)
 
@@ -66,15 +76,21 @@ export function MedicationPopup({
       intervalUnit
     )
 
-    if (!id) return //TODO: Error handling
-
     setActionPending(false)
+    if (!id) {
+      setToast('Failed creating Prescription!')
+      return
+    }
+
     handleClose(true)
   }
 
   const handleClose = async (refresh?: boolean) => {
     if (selectedPresc) {
-      if (endDate!.getTime() < startDate!.getTime()) return
+      if (endDate!.getTime() < startDate!.getTime()) {
+        setToast('Start Date has to be before End Date!')
+        return
+      }
 
       refresh = true
       setActionPending(true)
@@ -88,8 +104,12 @@ export function MedicationPopup({
         interval,
         intervalUnit
       )
-      if (!isUpdated) return //TODO: Error handling
+
       setActionPending(false)
+      if (!isUpdated) {
+        setToast('Failed updating Prescription!')
+        return
+      }
     }
 
     onClose(refresh ?? false)

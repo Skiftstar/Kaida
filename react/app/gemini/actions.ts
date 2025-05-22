@@ -52,7 +52,7 @@ const handleDiagnosisChange = async (
     false
   )
 
-  if (!isUpdated) return //TODO: error handling
+  if (!isUpdated) return //TODO: error handling with system message
 }
 
 const handleSessionCreate = async (

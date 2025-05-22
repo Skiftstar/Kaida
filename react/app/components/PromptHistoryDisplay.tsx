@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useToast } from '~/contexts/ToastContext'
 import type { PromptHistoryMessage } from '~/types'
 import { fetchPromptHistory } from '~/util/Api'
 
@@ -8,6 +9,8 @@ export function PromptHistoryDisplay({ chatId }: { chatId: number }) {
     undefined
   )
 
+  const { setToast } = useToast()
+
   useEffect(() => {
     handleFetchPromptHistory()
   }, [])
@@ -15,7 +18,10 @@ export function PromptHistoryDisplay({ chatId }: { chatId: number }) {
   const handleFetchPromptHistory = async () => {
     const messages = await fetchPromptHistory(chatId)
 
-    if (!messages) return //TODO: Error handling
+    if (!messages) {
+      setToast('Failed fetching Prompts!')
+      return
+    }
 
     setMessages(messages)
   }

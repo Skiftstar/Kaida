@@ -148,7 +148,6 @@ export async function generateUserResponse(
   return jsonResponse
 }
 
-//TODO: diagnoses type
 export async function formatNewChatPrompt(
   input: string,
   query_count: number,
@@ -317,7 +316,9 @@ export const handleChatContinuation = async (
 ) => {
   const prompts = await fetchPromptHistory(chatId)
 
-  if (!prompts) return //TODO: error handling
+  if (!prompts) {
+    return //TODO: Error handling
+  }
 
   let response = await chatSession.sendMessage(CONTEXT_FILL_PROMPT)
   let responseText = cleanResponse(response.response.text())

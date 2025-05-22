@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { SessionsPopup } from '~/components/Popups/SessionsPopup'
 import { usePage } from '~/contexts/PageContext'
+import { useToast } from '~/contexts/ToastContext'
 import type { Diagnosis, Session } from '~/types'
 import { getRecentDiagnoses, getUserSessions } from '~/util/Api'
 
@@ -18,12 +19,16 @@ export default function SessionsRoute() {
   }, [])
 
   const { setCurrPage } = usePage()
+  const { setToast } = useToast()
   setCurrPage('Sessions')
 
   const fetchSessions = async () => {
     const sessions = await getUserSessions()
 
-    if (!sessions) return //TODO: Error handling
+    if (!sessions) {
+      setToast('Failed fetching Sessions!')
+      return
+    }
 
     setSessions(sessions)
   }
@@ -31,7 +36,10 @@ export default function SessionsRoute() {
   const fetchAllDiagnoses = async () => {
     const diagnoses = await getRecentDiagnoses(-1) //-1 to fetch all
 
-    if (!diagnoses) return //TODO: Error Handling
+    if (!diagnoses) {
+      setToast('Failed fetching Diagnosis Data!')
+      return
+    }
 
     diagnoses.sort((a, b) => a.id - b.id)
 

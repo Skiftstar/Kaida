@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react'
 import { getCurrentUser } from './util/Api'
 import { UserContext } from './contexts/UserContext'
 import type { User } from './types'
+import { ToastContext } from './contexts/ToastContext'
 
 export const links: Route.LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
@@ -53,7 +54,13 @@ export default function App() {
   const [user, setUser] = useState<User | undefined>(undefined)
   const [initialized, setInitialized] = useState(false)
   const [initFailed, setInitFailed] = useState(false)
+  const [toast, setToast] = useState<string | undefined>(undefined)
+  const [toastInitialized, setToastInitialized] = useState(false)
+  const [toastTimer, setToastTimer] = useState<NodeJS.Timeout | undefined>(
+    undefined
+  )
   const INIT_TIMEOUT = 10000
+  const TOAST_DELAY = 3000
 
   const nav = useNavigate()
 
@@ -82,9 +89,30 @@ export default function App() {
     setUser(user)
   }
 
+  const setNewToast = (toast: string) => {
+    setToastInitialized(true)
+    setToast(toast)
+    if (toastTimer) clearTimeout(toastTimer)
+    const timer = setTimeout(() => {
+      setToast(undefined)
+    }, TOAST_DELAY)
+    setToastTimer(timer)
+  }
+
   return initialized ? (
     <UserContext.Provider value={{ user, setUser }}>
-      <SideLayout />
+      <ToastContext.Provider value={{ setToast: setNewToast }}>
+        <div
+          className={`toast ${toast ? 'toast-open' : 'toast-closed'} ${
+            toastInitialized ? 'block' : 'hidden'
+          } absolute flex w-full justify-center items-center z-30 min-h-[20px]`}
+        >
+          <div className="!bg-red-400 rounded p-2 !text-white flex items-center justify-center w-1/3 h-full">
+            <span className="text-center">{toast}</span>
+          </div>
+        </div>
+        <SideLayout />
+      </ToastContext.Provider>
     </UserContext.Provider>
   ) : (
     <div>{initFailed && <span>Init failed!</span>}</div>

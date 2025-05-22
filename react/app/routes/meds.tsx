@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { MedicationPopup } from '~/components/Popups/MedicationPopup'
 import { usePage } from '~/contexts/PageContext'
+import { useToast } from '~/contexts/ToastContext'
 import type { Prescription } from '~/types'
 import { getUserPrescriptions } from '~/util/Api'
 
@@ -16,12 +17,16 @@ export default function MedsRoute() {
   }, [])
 
   const { setCurrPage } = usePage()
+  const { setToast } = useToast()
   setCurrPage('Medication')
 
   const fetchPrescriptions = async () => {
     const prescriptions = await getUserPrescriptions()
 
-    if (!prescriptions) return //TODO: Error handling
+    if (!prescriptions) {
+      setToast('Failed fetching Prescriptions!')
+      return
+    }
 
     setPrescriptions(prescriptions)
   }

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { PermanentEmbeddingsPopup } from '~/components/Popups/PermanentEmbeddingsPopup'
 import { usePage } from '~/contexts/PageContext'
+import { useToast } from '~/contexts/ToastContext'
 import { useUser } from '~/contexts/UserContext'
 import type { Embedding } from '~/types'
 import { fetchAllUserEmbeddings, logoutUser } from '~/util/Api'
@@ -13,6 +14,7 @@ export default function ProfileRoute() {
   )
   const [embeddingsPopupOpen, setEmbeddingsPopupOpen] = useState(false)
   const { user, setUser } = useUser()
+  const { setToast } = useToast()
   const nav = useNavigate()
 
   const { setCurrPage } = usePage()
@@ -25,7 +27,10 @@ export default function ProfileRoute() {
   const fetchEmbeddings = async () => {
     const embeddings = await fetchAllUserEmbeddings()
 
-    if (!embeddings) return //TODO: error handling
+    if (!embeddings) {
+      setToast('Error fetching Embeddings!')
+      return
+    }
 
     setEmbeddings(embeddings)
   }

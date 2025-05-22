@@ -403,6 +403,7 @@ export const updateUserEmbedding = async (
 export const insertSingleUserEmbedding = async (
   text: string
 ): Promise<number | undefined> => {
+  return undefined
   const response = await post(`/embeddings/insert`, { text })
 
   if (response.status !== 201) return undefined

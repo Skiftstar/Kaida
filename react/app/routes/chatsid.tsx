@@ -16,11 +16,13 @@ import { usePage } from '~/contexts/PageContext'
 import { ChatSettingsPopup } from '~/components/Popups/ChatSettingsPopup'
 import SettingsIcon from '@mui/icons-material/Settings'
 import SendIcon from '@mui/icons-material/Send'
+import { useToast } from '~/contexts/ToastContext'
 
 export default function ChatsDetail() {
   const { id } = useParams()
 
   const { setCurrPage } = usePage()
+  const { setToast } = useToast()
 
   const [inputValue, setInputValue] = useState('')
   const [textmsgs, setTextMsgs] = useState<Message[]>([])
@@ -53,7 +55,10 @@ export default function ChatsDetail() {
 
   const fetchChatCoreInfo = async () => {
     const chatInfo = await getCoreChatInfo(Number(id))
-    if (!chatInfo) return //TODO: handle error
+    if (!chatInfo) {
+      setToast('Failed fetching Chat Info!')
+      return
+    }
     setChatCoreInfo(chatInfo)
     setCurrPage(chatInfo.title)
   }
@@ -61,7 +66,10 @@ export default function ChatsDetail() {
   const fetchChatMsgs = async () => {
     const messages = await fetchAllChatMessages(Number(id))
 
-    if (!messages) return //TODO: handle error
+    if (!messages) {
+      setToast('Failed fetching Messages!')
+      return
+    }
 
     setTextMsgs(messages)
   }
@@ -79,7 +87,10 @@ export default function ChatsDetail() {
 
     const messageId = await insertNewChatMessage('User', message, Number(id))
 
-    if (!messageId) return //TODO: Error handling
+    if (!messageId) {
+      setToast('Failed sending Message!')
+      return
+    }
 
     setModelThinking(true)
 
@@ -109,7 +120,10 @@ export default function ChatsDetail() {
       Number(id)
     )
 
-    if (!responseMsgId) return //TODO: Error handling
+    if (!responseMsgId) {
+      setToast('Failed storing AI answer!')
+      return
+    }
 
     setTextMsgs((old) => [
       ...old,
