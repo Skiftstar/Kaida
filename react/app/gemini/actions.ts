@@ -26,7 +26,8 @@ export const handleActions = async (
       case ActionNames.DIAGNOSIS_CHANGE:
         handleDiagnosisChange(
           action.params as DiagnosisChangeParams,
-          diagnosisId
+          diagnosisId,
+          chatId
         )
         break
       case ActionNames.SESSION_CREATE:
@@ -42,7 +43,8 @@ export const handleActions = async (
 
 const handleDiagnosisChange = async (
   params: DiagnosisChangeParams,
-  diagnosisId: number
+  diagnosisId: number,
+  chatId: number
 ) => {
   const isUpdated = await updateDiagnosis(
     diagnosisId,
@@ -52,7 +54,13 @@ const handleDiagnosisChange = async (
     false
   )
 
-  if (!isUpdated) return //TODO: error handling with system message
+  if (!isUpdated) {
+    await insertNewChatMessage(
+      'System',
+      'Kaida tried updating your chat title/summary but ran into an error. If this error persists, please contact Support.',
+      chatId
+    )
+  }
 }
 
 const handleSessionCreate = async (
@@ -67,7 +75,14 @@ const handleSessionCreate = async (
     diagnosisId
   )
 
-  if (!id) return //TODO: error handling
+  if (!id) {
+    await insertNewChatMessage(
+      'System',
+      `We tried creating a Session "${params.title}" for you on ${params.date}, but ran into an error. If this error persists, please contact Support.`,
+      chatId
+    )
+    return
+  }
 
   const msgId = await insertNewChatMessage(
     'System',
@@ -79,5 +94,5 @@ const handleSessionCreate = async (
     chatId
   )
 
-  if (!msgId) return //TODO: error handling
+  if (!msgId) return //TODO: Would need error handling, but not sure how
 }

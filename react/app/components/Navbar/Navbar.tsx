@@ -75,7 +75,7 @@ export function Navbar({
           {navbarOpen && (
             <div>
               <img
-                src={isDark ? './kaidabannerB.png' : './kaidabannerL.png'}
+                src={isDark ? '/kaidabannerB.png' : '/kaidabannerL.png'}
                 style={{ width: '100%', height: '200px', objectFit: 'cover' }}
                 alt="navbar"
               />

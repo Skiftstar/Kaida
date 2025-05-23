@@ -6,7 +6,8 @@ import {
   createNewDiagnosis,
   getAllChatsOfUser,
   createNewChat,
-  insertNewChatMessage
+  insertNewChatMessage,
+  deleteDiagnosis
 } from '~/util/Api'
 import type { Chat } from '~/types'
 import { NEW_CHAT_MESSAGE } from '~/util/MessageTemplates'
@@ -50,8 +51,9 @@ export default function Index() {
     const chat_id = await createNewChat(diagnosis_id)
     if (!chat_id) {
       setToast('Failed creating new Chat!')
+      await deleteDiagnosis(diagnosis_id)
       return
-    } //TODO: Cleanup diagnosis
+    }
 
     insertNewChatMessage('System', NEW_CHAT_MESSAGE, chat_id)
 
