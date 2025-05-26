@@ -1,10 +1,18 @@
-import { useNavigate, useParams } from 'react-router'
+import { useNavigate } from 'react-router'
 import { Popup } from '../Popup'
-import { deleteDiagnosis, updateDiagnosis } from '~/util/Api'
-import type { ChatInfo } from '~/types'
+import {
+  deleteDiagnosis,
+  deleteDiagnosisEmbedding,
+  getDiagnosisEmbeddings,
+  insertSingleDiagnosisEmbedding,
+  updateDiagnosis,
+  updateDiagnosisEmbedding
+} from '~/util/Api'
+import type { ChatInfo, Embedding } from '~/types'
 import { useEffect, useState } from 'react'
 import { PromptHistoryDisplay } from '../PromptHistoryDisplay'
 import { useToast } from '~/contexts/ToastContext'
+import { EmbeddingsDisplay } from '../EmbeddingsDisplay'
 
 export function ChatSettingsPopup({
   open,
@@ -22,6 +30,24 @@ export function ChatSettingsPopup({
   const [showPromptHistory, setShowPromptHistory] = useState(false)
   const [showEmbeddings, setShowEmbeddings] = useState(false)
   const [actionPending, setActionPending] = useState(false)
+  const [diagnosisEmbeddings, setDiagnosisEmbeddings] = useState<Embedding[]>(
+    []
+  )
+
+  useEffect(() => {
+    fetchDiagnosisEmbeddings()
+  }, [])
+
+  const fetchDiagnosisEmbeddings = async () => {
+    const embeddings = await getDiagnosisEmbeddings(chatCoreInfo.diagnosis_id)
+
+    if (!embeddings) {
+      setToast('Failed fetching Embeddings!')
+      return
+    }
+
+    setDiagnosisEmbeddings(embeddings)
+  }
 
   useEffect(() => {
     setTitle(chatCoreInfo.title)
@@ -67,6 +93,61 @@ export function ChatSettingsPopup({
     }
 
     onClose()
+  }
+
+  const onEmbeddingEdit = async (newEmbedding: string, embeddingId: number) => {
+    setActionPending(true)
+    const isUpdated = await updateDiagnosisEmbedding(
+      embeddingId,
+      chatCoreInfo.diagnosis_id,
+      newEmbedding.trim()
+    )
+
+    if (!isUpdated) {
+      setToast('Error updating Embedding!')
+      setActionPending(false)
+      return false
+    }
+
+    await fetchDiagnosisEmbeddings()
+    setActionPending(false)
+    return true
+  }
+
+  const onEmbeddingCreate = async (embedding: string) => {
+    setActionPending(true)
+    const id = await insertSingleDiagnosisEmbedding(
+      embedding.trim(),
+      chatCoreInfo.diagnosis_id
+    )
+
+    if (!id) {
+      setToast('Error creating Embedding!')
+      setActionPending(false)
+      return false
+    }
+
+    await fetchDiagnosisEmbeddings()
+    setActionPending(false)
+    return true
+  }
+
+  const onEmbeddingDelete = async (embeddingId: number) => {
+    setActionPending(true)
+    const isDeleted = await deleteDiagnosisEmbedding(
+      embeddingId,
+      chatCoreInfo.diagnosis_id
+    )
+
+    if (!isDeleted) {
+      setToast('Error deleting Embedding!')
+      setActionPending(false)
+      return false
+    }
+
+    await fetchDiagnosisEmbeddings()
+    setActionPending(false)
+    return true
   }
 
   return (
@@ -124,6 +205,14 @@ export function ChatSettingsPopup({
           >
             {showEmbeddings ? 'Hide' : 'Show'} Diagnosis Embeddings
           </button>
+          {showEmbeddings && (
+            <EmbeddingsDisplay
+              embeddings={diagnosisEmbeddings}
+              onEdit={onEmbeddingEdit}
+              onCreate={onEmbeddingCreate}
+              onDelete={onEmbeddingDelete}
+            />
+          )}
         </div>
         <div className="flex flex-col gap-2">
           <span className="font-bold text-2xl">Danger Zone</span>

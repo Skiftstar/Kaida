@@ -15,7 +15,6 @@ def cosine_sim(v1, v2):
 @login_required
 @embeddings_bp.route("insert", methods=["POST"])
 def insert_embedding():
-    """Insert a new text embedding into the database."""
     data = request.json
     text = data.get("text")
 

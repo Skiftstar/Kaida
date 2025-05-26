@@ -403,8 +403,58 @@ export const updateUserEmbedding = async (
 export const insertSingleUserEmbedding = async (
   text: string
 ): Promise<number | undefined> => {
-  return undefined
   const response = await post(`/embeddings/insert`, { text })
+
+  if (response.status !== 201) return undefined
+
+  return response.data.id
+}
+
+export const getDiagnosisEmbeddings = async (
+  diagnosisId: number
+): Promise<Embedding[] | undefined> => {
+  const response = await get(`/diagnosis/${diagnosisId}/embeddings/all`)
+
+  if (response.status !== 200) return undefined
+
+  return response.data.embeddings
+}
+
+export const deleteDiagnosisEmbedding = async (
+  embeddingId: number,
+  diagnosisId: number
+): Promise<boolean> => {
+  const response = await del(
+    `/diagnosis/${diagnosisId}/embeddings/${embeddingId}`
+  )
+
+  if (response.status !== 204) return false
+
+  return true
+}
+
+export const updateDiagnosisEmbedding = async (
+  embeddingId: number,
+  diagnosisId: number,
+  text: string
+): Promise<boolean> => {
+  const response = await put(
+    `/diagnosis/${diagnosisId}/embeddings/${embeddingId}`,
+    { text }
+  )
+
+  if (response.status !== 200) return false
+
+  return true
+}
+
+export const insertSingleDiagnosisEmbedding = async (
+  text: string,
+  diagnosisId: number
+): Promise<number | undefined> => {
+  const response = await post(`/diagnosis/${diagnosisId}/embeddings/insert`, {
+    text
+  })
 
   if (response.status !== 201) return undefined
 
