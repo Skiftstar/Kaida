@@ -1,5 +1,5 @@
 from . import diagnosis_bp
-from db import get_db_connection, execute_query
+from db import get_db_connection, execute_query, execute_and_fetchall_query
 from flask import request, jsonify
 from sentence_transformer import model
 from flask_login import login_required, current_user
@@ -100,3 +100,26 @@ def delete_diagnosis(id):
         return jsonify({"error deleting diagnosis"}), 500
 
     return jsonify({}), 204
+
+@login_required
+@diagnosis_bp.route("get-multi-embedding", methods=["GET"])
+def get_multiple_diagnoses_embedding():
+    diagnosis_ids = request.args.getlist("ids")
+    
+    if not diagnosis_ids:
+        return jsonify({"error": "Missing 'ids' query parameter"}), 400
+
+    response = dict()
+
+    for id in diagnosis_ids:
+        results = execute_and_fetchall_query("SELECT id, text FROM diagnosis_embeddings WHERE diagnosis_id = %s", (id, ))
+
+        if results is None:
+            print(f"Error fetching embeddings for Diagnosis with ID {id}")
+            response[id] = []
+            return
+
+
+        response[id] = [row[1] for row in results]
+
+    return jsonify(response), 200
