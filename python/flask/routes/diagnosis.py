@@ -107,7 +107,7 @@ def get_multiple_diagnoses_embedding():
     diagnosis_ids = request.args.getlist("ids")
     
     if not diagnosis_ids:
-        return jsonify({"error": "Missing 'ids' query parameter"}), 400
+        return jsonify({}), 200
 
     response = dict()
 

@@ -4,6 +4,7 @@ import type {
   Diagnosis,
   Embedding,
   Message,
+  MultiDiagnosisEmbeddings,
   Prescription,
   PrescriptionDoseUnit,
   PrescriptionIntervalUnit,
@@ -459,4 +460,22 @@ export const insertSingleDiagnosisEmbedding = async (
   if (response.status !== 201) return undefined
 
   return response.data.id
+}
+
+export const getMultiDiagnosisEmbeddings = async (
+  diagnosisIds: string[]
+): Promise<undefined | MultiDiagnosisEmbeddings> => {
+  const params = new URLSearchParams()
+  diagnosisIds.forEach((id) => {
+    params.append('ids', id)
+  })
+  const response = await get(
+    `/diagnosis/get-multi-embedding?${params.toString()}`
+  )
+
+  if (response.status !== 200) {
+    return undefined
+  }
+
+  return response.data
 }

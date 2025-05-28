@@ -86,3 +86,7 @@ export type Diagnosis = {
   created_at: number
   updated_at: number
 }
+
+export type MultiDiagnosisEmbeddings = {
+  [diagnosisId: number]: Embedding[]
+}

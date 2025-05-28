@@ -8,13 +8,20 @@ import {
 import {
   addToPromptHistory,
   fetchPromptHistory,
+  getMultiDiagnosisEmbeddings,
   getRecentDiagnoses,
   getUserPrescriptions,
+  insertNewChatMessage,
   searchEmbeddings,
   storeKeyDiagnosisInfo,
   storeKeyPermanentInfo
 } from '~/util/Api'
-import type { Action, Diagnosis, Prescription } from '~/types'
+import type {
+  Action,
+  Diagnosis,
+  MultiDiagnosisEmbeddings,
+  Prescription
+} from '~/types'
 import { handleActions } from './actions'
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
@@ -56,8 +63,8 @@ export async function parseInitialQuery(
   | undefined
 > {
   try {
-    const result = await chatSession.sendMessage(prompt)
-    const responseText = cleanResponse(result.response.text())
+    const result = await sendToGemini(prompt, chatSession, chatId)
+    const responseText = cleanResponse(result)
 
     console.log('responesText', responseText)
 
@@ -93,8 +100,9 @@ export async function extractInfoFromUserInput(
   | undefined
 > {
   try {
-    const result = await chatSession.sendMessage(input)
-    const responseText = cleanResponse(result.response.text())
+    const result = await sendToGemini(input, chatSession, chatId)
+    console.log(result)
+    const responseText = cleanResponse(result)
 
     // Parse the cleaned JSON response
     const jsonResponse: {
@@ -109,17 +117,20 @@ export async function extractInfoFromUserInput(
     await addToPromptHistory(chatId, 'Bot', responseText)
 
     return jsonResponse
-  } catch (error) {
-    console.error('Error generating text:', error)
+  } catch (error: any) {
+    await insertNewChatMessage(
+      'System',
+      `Kaida ran into an error generating the response.\nIf this error persists please contact support.\nError: ${error.message}`,
+      chatId
+    )
     return undefined
   }
 }
 
-//TODO: change diagnosesData type
 export async function generateUserResponse(
   requestedKnowledgeData: { [term: string]: string },
   medicalPlans: Prescription[],
-  diagnosesData: any,
+  diagnosesData: MultiDiagnosisEmbeddings,
   userQuery: string,
   chatSession: ChatSession,
   chatId: number
@@ -133,19 +144,27 @@ export async function generateUserResponse(
     .replace('{{current_date}}', new Date(Date.now()).toLocaleDateString())
     .replace('{{medical_plans}}', JSON.stringify(medicalPlans))
 
-  const result = await chatSession.sendMessage(prompt_template)
-  const responseText = cleanResponse(result.response.text())
+  const result = await sendToGemini(prompt_template, chatSession, chatId)
+  const responseText = cleanResponse(result)
 
-  const jsonResponse: {
-    response: string
-    actions: Action[]
-  } = JSON.parse(responseText)
-  console.log('jsonResponse', jsonResponse)
+  try {
+    const jsonResponse: {
+      response: string
+      actions: Action[]
+    } = JSON.parse(responseText)
 
-  await addToPromptHistory(chatId, 'System', prompt_template)
-  await addToPromptHistory(chatId, 'Bot', responseText)
+    await addToPromptHistory(chatId, 'System', prompt_template)
+    await addToPromptHistory(chatId, 'Bot', responseText)
 
-  return jsonResponse
+    return jsonResponse
+  } catch (error: any) {
+    await insertNewChatMessage(
+      'System',
+      `Kaida ran into an error generating the response.\nIf this error persists please contact support.\nError: ${error.message}`,
+      chatId
+    )
+    return { response: '', actions: [] }
+  }
 }
 
 export async function formatNewChatPrompt(
@@ -282,10 +301,10 @@ const lookupInformation = async (
   diagnosisIds: string[],
   lookupTerms: string[]
 ) => {
-  //TODO: Lookup information that Gemini wants and generate response with that
   const knowledgeData =
     lookupTerms.length > 0 ? await searchEmbeddings(lookupTerms) : {}
-  const diagnosesData: any[] = []
+  const diagnosesData: MultiDiagnosisEmbeddings =
+    (await getMultiDiagnosisEmbeddings(diagnosisIds)) ?? {}
 
   return { knowledgeData, diagnosesData }
 }
@@ -317,12 +336,24 @@ export const handleChatContinuation = async (
   const prompts = await fetchPromptHistory(chatId)
 
   if (!prompts) {
-    return //TODO: Error handling
+    await insertNewChatMessage(
+      'System',
+      'Kaida ran into an error trying to initiate the Chat. If this error persists please contact support.',
+      chatId
+    )
+    return
   }
 
-  let response = await chatSession.sendMessage(CONTEXT_FILL_PROMPT)
-  let responseText = cleanResponse(response.response.text())
-  if (responseText !== 'Acknowledged') return //TODO: Error handling
+  let response = await sendToGemini(CONTEXT_FILL_PROMPT, chatSession, chatId)
+  let responseText = cleanResponse(response)
+  if (responseText !== 'Acknowledged') {
+    await insertNewChatMessage(
+      'System',
+      'Kaida ran into an error trying to initiate the Chat. If this error persists please contact support.',
+      chatId
+    )
+    return
+  }
 
   for (let i = 0; i < prompts.length; i += CONTEXT_REFRESH_CHUNK_SIZE) {
     const chunk = prompts.slice(i, i + CONTEXT_REFRESH_CHUNK_SIZE)
@@ -335,11 +366,39 @@ export const handleChatContinuation = async (
       }
     })
     const input = `${JSON.stringify(formattedPrompts)} ${
-      isLast ? 'DONE :D' : ''
+      isLast
+        ? 'DONE :D Now stop responding with "Acknowledged" and follow new instructions.'
+        : ''
     }`
 
-    response = await chatSession.sendMessage(input)
-    responseText = cleanResponse(response.response.text())
-    if (responseText !== 'Acknowledged') return //TODO: Error handling
+    response = await sendToGemini(input, chatSession, chatId)
+    responseText = cleanResponse(response)
+    if (responseText !== 'Acknowledged') {
+      await insertNewChatMessage(
+        'System',
+        'Kaida ran into an error trying to initiate the Chat. If this error persists please contact support.',
+        chatId
+      )
+      return
+    }
+  }
+}
+
+const sendToGemini = async (
+  message: string,
+  chatSession: ChatSession,
+  chatId: number
+) => {
+  try {
+    const response = await chatSession.sendMessage(message)
+    console.log(message, response.response.text())
+    return response.response.text()
+  } catch (err: any) {
+    await insertNewChatMessage(
+      'System',
+      `Kaida ran into an error generating the response.\nIf this error persists please contact support.\nError: ${err.message}`,
+      chatId
+    )
+    return ''
   }
 }

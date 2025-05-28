@@ -98,4 +98,5 @@ Format of the message will be:
 If all prompts have been fed to you, the message will end with "DONE :D"
 to each message only respond with "Acknowledged"
 Reply with "Acknowledged" if you understood these instuctions. Afterwards we will start feeding prompts to you.
+Once all Prompts have been fed to you, STOP responding with Acknowledged and ONLY respond with the json format we provide to you.
 `
