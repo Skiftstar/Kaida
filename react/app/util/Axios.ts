@@ -18,11 +18,19 @@ axios.interceptors.response.use(
 )
 
 export const post = (path: string, body: any) => {
-  return axios.post(API_URL + path, body, { withCredentials: true })
+  return axios
+    .post(API_URL + path, body, { withCredentials: true })
+    .catch((err) => {
+      return { status: err.response.status, data: null }
+    })
 }
 
 export const put = (path: string, body: any) => {
-  return axios.put(API_URL + path, body, { withCredentials: true })
+  return axios
+    .put(API_URL + path, body, { withCredentials: true })
+    .catch((err) => {
+      return { status: err.response.status, data: null }
+    })
 }
 
 export const get = (path: string) => {

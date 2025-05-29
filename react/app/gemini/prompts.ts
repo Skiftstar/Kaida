@@ -9,8 +9,8 @@ So you do not need to include any disclaimers in your response.
 `
 
 const ACTION_BOILERPLATE = `You may execute the following actions as well:
-		{Action: Diagnosis_change, Description: Change title and Summary of Diagnosis, Params: [title: string, summary: string] }
-		{Action: Session_create, Description: Create a new doctor appointment, Params: [title: string, reason: string, date:datetime] }
+		{Action: Diagnosis_change, Description: Change title and Summary of Diagnosis, Params: {"title": string, "summary": string} }
+		{Action: Session_create, Description: Create a new doctor appointment, Params: {"title": string, "reason": string, "date": datetime} }
 
 Only ask the user for date and time. Do not ask for reason, title, or anything else.
 If the user says something vague like “before 2pm” or “in the morning,” suggest a specific time like 11am and ask for confirmation.
@@ -55,7 +55,7 @@ In your response, you can also ask the user for additional information, if you t
 Format:
 {
   "response": "The response you would give to the user based on the information we provided you with",
-	"actions": ["List of actions you want to execute, or empty if none, each action formatted as: {action: actionName, params: [param1: value1, param2: value2, etc]}"]
+	"actions": ["List of actions you want to execute, or empty if none, each action formatted as: {action: actionName, params: {"param1": value1, "param2": value2, ...}}"]
 }
 
 Information about diagnoses you requested: {{diagnoses}}

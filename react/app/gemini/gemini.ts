@@ -236,7 +236,9 @@ export const handleUserInput = async (
   )
 
   const response = modelResponse.response
-  await handleActions(modelResponse.actions, diagnosisId, chatId)
+  const actions = modelResponse.actions
+  console.log('Actions', actions, 'ModelResponse', modelResponse)
+  await handleActions(actions, diagnosisId, chatId)
   return { response, actionsExecuted: modelResponse.actions.length > 0 }
 }
 

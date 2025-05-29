@@ -54,6 +54,8 @@ const handleDiagnosisChange = async (
     false
   )
 
+  console.log('DiagnosisUpdated?', isUpdated)
+
   if (!isUpdated) {
     await insertNewChatMessage(
       'System',
