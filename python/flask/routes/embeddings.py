@@ -49,17 +49,12 @@ def insert_many_embeddings_redo():
         # Fetch all existing embeddings for current user once
         cur.execute("SELECT text, embedding FROM embeddings WHERE user_id = %s", (current_user.id,))
         raw = cur.fetchall()
-        print(raw)
         existing = [(text, ast.literal_eval(embedding)) for text, embedding in raw]
-
-        print(existing)
 
         # Filter out texts that are too similar to existing ones
         threshold = 0.9
         to_insert = []
         for text, emb in encoded_texts:
-            for e in existing:
-                print(cosine_sim(emb, e[1]))
             if any(cosine_sim(emb, e[1]) > threshold for e in existing):
                 print(f"Skipped similar text: {text}")
                 continue

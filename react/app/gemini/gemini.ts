@@ -359,7 +359,7 @@ export const handleChatContinuation = async (
 
   for (let i = 0; i < prompts.length; i += CONTEXT_REFRESH_CHUNK_SIZE) {
     const chunk = prompts.slice(i, i + CONTEXT_REFRESH_CHUNK_SIZE)
-    const isLast = i + 4 >= prompts.length
+    const isLast = i + CONTEXT_REFRESH_CHUNK_SIZE >= prompts.length
 
     const formattedPrompts = chunk.map((prompt) => {
       return {
