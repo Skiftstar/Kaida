@@ -183,19 +183,7 @@ export function ChatSettingsPopup({
           </span>
         </div>
         <div className="flex flex-col gap-2">
-          <span className="font-bold text-2xl">Debugging Zone</span>
-          <button
-            onClick={() => {
-              setShowPromptHistory(!showPromptHistory)
-            }}
-            className="bg-[var(--usermessage-background-color)] font-bold rounded p-2"
-            disabled={actionPending}
-          >
-            {showPromptHistory ? 'Hide' : 'Show'} Prompt History
-          </button>
-          {showPromptHistory && (
-            <PromptHistoryDisplay chatId={chatCoreInfo.id} />
-          )}
+          <span className="font-bold text-2xl">Knowledge</span>
           <button
             onClick={() => {
               setShowEmbeddings(!showEmbeddings)
@@ -203,7 +191,7 @@ export function ChatSettingsPopup({
             className="bg-[var(--usermessage-background-color)] font-bold rounded p-2"
             disabled={actionPending}
           >
-            {showEmbeddings ? 'Hide' : 'Show'} Diagnosis Embeddings
+            {showEmbeddings ? 'Hide' : 'Show'} collected Knowledge
           </button>
           {showEmbeddings && (
             <EmbeddingsDisplay
@@ -223,6 +211,21 @@ export function ChatSettingsPopup({
           >
             Delete Chat
           </button>
+        </div>
+        <div className="flex flex-col gap-2">
+          <span className="font-bold text-2xl">Debugging Zone</span>
+          <button
+            onClick={() => {
+              setShowPromptHistory(!showPromptHistory)
+            }}
+            className="bg-[var(--usermessage-background-color)] font-bold rounded p-2"
+            disabled={actionPending}
+          >
+            {showPromptHistory ? 'Hide' : 'Show'} Prompt History
+          </button>
+          {showPromptHistory && (
+            <PromptHistoryDisplay chatId={chatCoreInfo.id} />
+          )}
         </div>
       </div>
     </Popup>
