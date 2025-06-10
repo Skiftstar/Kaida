@@ -2,14 +2,17 @@ Python 3.10+ doesn't work because of some bad version check in one of the depend
 
 Currently using 3.9.6
 
-# Start BackEnd (Flask + Postgres)
+# Start via Docker (Flask + Postgres + Frontend)
+
 ```
-cd python
 docker-compose up -d --build
 ```
 
+Access Frontend at `localhost:3000`
+
 # Running Flask locally without Docker 
 on MacOS you need PostgreSQL from Brew to install psycopg2
+
 ```
 brew install postgresql
 ```
