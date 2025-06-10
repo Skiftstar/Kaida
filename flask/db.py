@@ -1,11 +1,9 @@
 import psycopg2
 import os
-
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://myuser:mypassword@localhost:5432/my_vectors")
-
+from flask import current_app
 
 def get_db_connection():
-    return psycopg2.connect(DATABASE_URL)
+    return psycopg2.connect(current_app.config['DATABASE_URL'])
 
 def execute_and_fetchone_query(query: str, params: tuple):
     try:

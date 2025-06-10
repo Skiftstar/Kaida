@@ -140,6 +140,7 @@ export default function ChatsDetail() {
     }
 
     setModelThinking(false)
+    setFreshSession(false)
   }
 
   return (

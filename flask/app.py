@@ -5,21 +5,14 @@ from models import User
 from werkzeug.security import check_password_hash
 from flask_cors import CORS
 from flask_session import Session
-from cachelib.file import FileSystemCache
+from config import Config
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = "sdjngksdgnkdsndksndksgnkgkdsngkdsngkdsngkdsngkdsngkdsngkdsngkdsngkdsngkdsngk"
+    
+    app.config.from_object(Config)
 
-    app.config['SESSION_TYPE'] = 'cachelib'
-    app.config['SESSION_SERIALIZATION_FORMAT'] = 'json'
-    app.config['SESSION_USE_SIGNER'] = True
-    app.config['SESSION_PERMANENT'] = True
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-    app.config["SESSION_COOKIE_SECURE"] = False
-    app.config['SESSION_CACHELIB'] = FileSystemCache(threshold=500, cache_dir="./sessions")
-
-    cors = CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}})
+    cors = CORS(app, supports_credentials=True, resources={r"/*": {"origins": ["http://localhost:5173", "http://localhost:3000"]}})
     server_session = Session(app)
 
     login_manager = LoginManager()
