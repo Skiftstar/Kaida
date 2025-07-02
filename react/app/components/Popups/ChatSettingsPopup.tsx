@@ -35,8 +35,8 @@ export function ChatSettingsPopup({
   )
 
   useEffect(() => {
-    fetchDiagnosisEmbeddings()
-  }, [])
+    if (showEmbeddings) fetchDiagnosisEmbeddings()
+  }, [showEmbeddings])
 
   const fetchDiagnosisEmbeddings = async () => {
     const embeddings = await getDiagnosisEmbeddings(chatCoreInfo.diagnosis_id)
