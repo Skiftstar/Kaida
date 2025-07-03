@@ -134,7 +134,10 @@ def search_similar_many():
             row = cur.fetchone()
             if row:
                 result_text, distance = row
-                results.append({"query_term": text, "result": result_text})
+                if distance < 0.5:
+                    results.append({"query_term": text, "result": result_text})
+                else:
+                    results.append({"query_term": text, "result": ""})
             else:
                 results.append({"query_term": text, "result": ""})
 
